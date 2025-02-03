@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>3D Model Viewer</title>
+	<style>
+		body {
+			margin: 0;
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: rgb(53, 53, 53);
+		}
+
+		.three-container {
+			width: 100%;
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: #282c34;
+		}
+
+		#joystick {
+			position: absolute;
+			bottom: 30%;
+			left: 50%;
+			transform: translate(-50%, 50%);
+			width: 350px;
+			height: 350px;
+		}
+
+		#tutorialScreen {
+			position: absolute;
+			bottom: 30%;
+			left: 50%;
+			transform: translate(-50%, 60%);
+			width: 350px;
+			height: 350px;
+			display: flex;
+			gap: 5px;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+		}
+	</style>
+</head>
+
+<body>
+	<script src="https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r92/examples/js/loaders/GLTFLoader.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<!-- <canvas id="gameCanvas" width="300" height="500"></canvas> -->
+
+	<div id="app">
+		<three-scene></three-scene>
+	</div>
+
+	<template id="app-template">
+		<div ref="threeContainer" class="w-[400px] h-[600px]"></div>
+
+	</template>
+
+	<div id="joystick"></div>
+
+	<div v-if="showTutorial" id="tutorialScreen" class="uppercase bold underline text-xl">
+		<div class="animate-bounce">
+			Drag to move!
+		</div>
+		<div class="animate-pulse">
+			<img src="/assets/hand.png">
+		</div>
+	</div>
+
+	<!-- <script>
+		// Vue Component: ThreeScene
+		const ThreeScene = {
+			template: '#app-template',  // Referencing the external template
+
+			mounted() {
+				const container = this.$refs.threeContainer;
+
+				// Set up the scene
+				const scene = new THREE.Scene();
+
+				// Set up the camera
+				var camera = new THREE.PerspectiveCamera(40, 400 / 600, 0.1, 1000);
+				camera.position.y = 1;
+				camera.position.z = 5;
+				camera.rotation.x = -0.05
+
+				// Add a lights
+				const light = new THREE.DirectionalLight(0xffffff, 1);
+				light.position.set(1, 1, 1).normalize();
+				scene.add(light);
+
+				const light2 = new THREE.DirectionalLight(0xffffff, 1);
+				light2.position.set(-1, 1, -1).normalize();
+				scene.add(light2);
+
+				// Set up the renderer
+				const renderer = new THREE.WebGLRenderer();
+				renderer.setSize(400, 600);
+				renderer.setClearColor("#000000"); // Configure renderer clear color
+
+				container.appendChild(renderer.domElement);
+
+				//create ground
+				var geometryGround = new THREE.BoxGeometry(100, 1, 100);
+				var materialGround = new THREE.MeshStandardMaterial({ color: "#433F81" });
+				var ground = new THREE.Mesh(geometryGround, materialGround);
+				ground.position.set(0, -2, -10);
+
+				// Add ground to Scene
+				scene.add(ground);
+
+				// Load the 3D model
+				var model3D;
+				const loader = new THREE.GLTFLoader();
+				loader.load(
+					'assets/Vehicle.gltf', // model's path
+					function (gltf) {
+						model3D = gltf.scene;
+
+						// Scale down the model (e.g., 50% of its original size)
+						model3D.scale.set(0.01, 0.01, -0.01); // Scale x, y, and z axes uniformly
+
+						// Apply materials to all meshes in the model
+						model3D.traverse((node) => {
+							if (node.isMesh) {
+								const textureLoader = new THREE.TextureLoader();
+								const texture = textureLoader.load('assets/Colors.png');
+
+								node.material = new THREE.MeshStandardMaterial({
+									map: texture,
+								});
+							}
+						});
+
+						// Add the model to the scene
+						scene.add(model3D);
+
+						model3D.position.y = -1
+						// model3D.rotation.y = 3.15
+					},
+					function (xhr) {
+						// console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+					},
+					function (error) {
+						console.error('An error occurred', error);
+					}
+				);
+
+				/// Movement and rotation state
+				let velocity = { forward: 0, rotation: 0 }; // Tracks forward/backward velocity and rotation speed
+
+
+				let targetCameraPosition = new THREE.Vector3();
+				let targetCameraLookAt = new THREE.Vector3();
+
+				// Render Loop
+				var render = function () {
+					requestAnimationFrame(render);
+
+					// Apply movement and rotation to the model
+					if (model3D) {
+						// Forward movement
+						const forwardVector = new THREE.Vector3(0, 0, -1); // Forward direction in model space
+						forwardVector.applyQuaternion(model3D.quaternion); // Rotate to match the model's orientation
+						forwardVector.normalize(); // Ensure it's a unit vector
+
+						model3D.position.addScaledVector(forwardVector, velocity.forward);
+
+						// Rotation (around the Y-axis)
+						model3D.rotation.y += velocity.rotation;
+
+
+						// if (model3D.position.distanceTo(cube.position) < 1) {
+						// 	console.log("TRIGGER");
+						// }
+
+
+						// Smooth camera follow
+						const followDistance = 8; // Distance behind the model
+						const heightOffset = 3; // Height offset above the model
+
+						// Calculate the target camera position (behind the model)
+						const cameraOffset = new THREE.Vector3(0, heightOffset, followDistance); // Local offset in model space
+						cameraOffset.applyQuaternion(model3D.quaternion); // Rotate to align with model's orientation
+						targetCameraPosition.copy(model3D.position).add(cameraOffset);
+
+						// Interpolate (lerp) the camera's position for smooth movement
+						camera.position.lerp(targetCameraPosition, 0.05);
+
+						// Set the camera to look at the model
+						targetCameraLookAt.copy(model3D.position);
+						targetCameraLookAt.y += 2; //add offset
+						camera.lookAt(targetCameraLookAt);
+
+						if (velocity.forward > 0.01) {
+							showTutorial = false;
+						}
+
+						// console.log(showTutorial);
+					}
+
+					// Render the scene
+					renderer.render(scene, camera);
+				};
+
+				render();
+
+				const joystickZone = document.getElementById('joystick');
+				// Virtual joystick setup
+				const joystick = nipplejs.create({
+					zone: joystickZone, // Joystick inside the canvas container
+					mode: 'static',
+					position: { left: '50%', top: '50%' }, // Adjust position as needed
+					color: 'white',
+					restOpacity: 1,
+				});
+
+				// Map joystick movement to model rotation
+				joystick.on('move', (evt, data) => {
+					if (model3D && data.vector) {
+						const movementSpeed = 0.03; // Movement speed multiplier
+						const rotationSpeed = 0.01; // Rotation speed multiplier
+
+						velocity.forward = data.vector.y * movementSpeed; // Forward/backward movement
+						velocity.rotation = -data.vector.x * rotationSpeed; // Left/right rotation (negative to rotate correctly)
+					}
+				});
+
+				// Stop movement when joystick is released
+				joystick.on('end', () => {
+					velocity.forward = 0;
+					velocity.rotation = 0;
+				});
+
+
+				// Resize handling for responsiveness
+				window.addEventListener('resize', () => {
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize(window.innerWidth, window.innerHeight);
+				});
+			}
+		};
+
+		// Create and mount Vue app
+		/* const app = Vue.createApp({
+			components: {
+				'three-scene': ThreeScene
+			}
+		}); */
+		const { createApp, ref } = Vue;  // Destructure Vue methods for easier access
+		createApp({
+			// template: '#app-template', // Point to the template outside of the script
+			components: {
+				'three-scene': ThreeScene
+			},
+			setup() {
+				const showTutorial = ref(false); // Boolean to control whether the game is shown or not
+
+
+				// Set up canvas on mounted
+				/* onMounted(() => {
+					
+				}); */
+
+
+
+				return { showTutorial };
+			}
+		}).mount('#app');
+	</script> -->
+
+	<script>
+		const { createApp, ref, onMounted } = Vue;
+
+		createApp({
+			template: '#app-template', // Point to the template outside of the script
+			setup() {
+
+				var sceneWidth = 400;
+				var sceneHeight = 600;
+				
+				// Create a basic Three.js scene, camera, and renderer
+				const scene = new THREE.Scene();
+				const camera = new THREE.PerspectiveCamera(50, sceneWidth / sceneHeight, 0.1, 1000);
+				const renderer = new THREE.WebGLRenderer();
+				renderer.setSize(sceneWidth, sceneHeight);
+
+				// Create a cube and add it to the scene
+				const geometry = new THREE.BoxGeometry(1, 1, 1);
+				const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+				const cube = new THREE.Mesh(geometry, material);
+				scene.add(cube);
+
+				// Set the camera position
+				camera.position.z = 5;
+
+				// Animation function to rotate the cube
+				function animate() {
+					requestAnimationFrame(animate);
+
+					cube.rotation.x += 0.01;
+					cube.rotation.y += 0.01;
+
+					renderer.render(scene, camera);
+				}
+
+				// Attach the renderer to the DOM and start the animation
+				onMounted(() => {
+					document.body.appendChild(renderer.domElement);
+
+					animate();
+				});
+
+				return {
+					
+				};
+			}
+		}).mount('#app');
+	</script>
+
+</body>
+
+</html>

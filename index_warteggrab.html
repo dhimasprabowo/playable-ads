@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Playable Advertisement</title>
+	<style>
+		body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+		}
+
+		/* Styles for ad container */
+		#ad-container {
+			width: 320px;
+			height: 100vh;
+			position: relative;
+			background-color: #f2f2f2;
+		}
+
+		#game-canvas {
+			width: 100%;
+			height: 100%;
+			background-color: #fff;
+		}
+
+		.cta-button {
+			position: absolute;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: #ff7b00;
+			color: white;
+			padding: 10px;
+			font-size: 16px;
+			border: none;
+			cursor: pointer;
+		}
+
+		/* Message for the end of the game */
+        .end-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+			font-size: 18px;
+			text-align: center;
+        }
+
+		#scoretxt {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+			font-size: 18px;
+			text-align: center;
+        }
+
+		@media (max-width: 600px) {
+			#ad-container {
+				width: 100%;
+				height: 100vh;
+			}
+
+			#cta-button {
+				bottom: 20px;
+				font-size: 14px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Playable ad container -->
+	<div id="ad-container">
+		<canvas id="game-canvas"></canvas>
+		<button class="cta-button">Play Now!</button>
+		<div id="scoretxt">Score: 0</div>
+
+		<div class="end-message" id="endMessage">
+			<p>Game Over! Want to learn more?</p>
+			<a href="#" style="color: #ff6a00;">Click Here</a>
+		</div>
+	</div>
+
+	<script src="game.js"></script>
+</body>
+
+</html>

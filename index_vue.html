@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Playable Ad with Vue 3</title>
+	<!-- Include Vue 3 via CDN -->
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r92/examples/js/loaders/GLTFLoader.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		/* Your CSS styles here */
+
+		#app {
+			width: 300px;
+			height: 500px;
+			border: 2px solid #ccc;
+			background-color: #fff;
+			position: relative;
+			font-family: Arial, sans-serif;
+		}
+
+		#game-area {
+			width: 100%;
+			height: 80%;
+			background-color: #eee;
+		}
+
+		#cta {
+			padding: 10px;
+			text-align: center;
+		}
+
+		button {
+			padding: 10px 20px;
+			background-color: #007bff;
+			color: white;
+			border: none;
+			cursor: pointer;
+			border-radius: 5px;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+	</style>
+</head>
+
+<body class="flex flex-col items-center justify-center gap-3 h-[100vh] bg-[#292929]">
+	<!-- The App container -->
+	<div id="app"></div>
+
+	<!-- Template section outside of the script -->
+	<template id="app-template">
+		<div id="app">
+			<!-- CTA Button: Shows the game when clicked -->
+			<div v-if="!showGame">
+				<div id="cta">
+					<button @click="showTheGame">Play Game</button>
+				</div>
+			</div>
+
+			<!-- Game Area: Only shown if showGame is true -->
+			<div v-if="showGame">
+				<div id="game-area">
+					<canvas ref="canvasRef" width="300" height="400"></canvas>
+				</div>
+				<div id="cta">
+					<button @click="redirectToAppStore">Download Now</button>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="showGame" id="tutorialScreen" class="flex flex-col items-center uppercase bold underline text-xl">
+			<div class="animate-bounce">
+				Drag to move!
+			</div>
+			<div class="animate-pulse">
+				<img src="/assets/hand.png">
+			</div>
+		</div>
+	</template>
+
+	<script>
+		const { createApp, ref, onMounted } = Vue;
+
+		const App = {
+			template: '#app-template', // Point to the template outside of the script
+			setup() {
+				const showGame = ref(false); // Boolean to control whether the game is shown or not
+				const character = ref({
+					x: 150,
+					y: 200,
+					width: 50,
+					height: 50,
+					color: "#ff5733",
+				});
+				const canvasRef = ref(null);
+
+				// Draw the character on the canvas
+				const drawCharacter = () => {
+					const ctx = canvasRef.value.getContext("2d");
+					ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+					ctx.fillStyle = character.value.color;
+					ctx.fillRect(character.value.x, character.value.y, character.value.width, character.value.height);
+				};
+
+				// Handle click event to move the character
+				const handleClick = (event) => {
+					const clickX = event.clientX - canvasRef.value.offsetLeft;
+					const clickY = event.clientY - canvasRef.value.offsetTop;
+
+					if (
+						clickX > character.value.x &&
+						clickX < character.value.x + character.value.width &&
+						clickY > character.value.y &&
+						clickY < character.value.y + character.value.height
+					) {
+						character.value.x = Math.random() * (canvasRef.value.width - character.value.width);
+						character.value.y = Math.random() * (canvasRef.value.height - character.value.height);
+						drawCharacter();
+					}
+				};
+
+				// Set up canvas on mounted
+				onMounted(() => {
+					
+				});
+
+				// Redirect to App Store (replace with your link)
+				const redirectToAppStore = () => {
+					window.location.href = "https://your-app-store-link.com"; // Replace with actual app store link
+				};
+
+				// Function to show the game
+				const showTheGame = () => {
+					showGame.value = true;
+
+					canvasRef.value.addEventListener("click", handleClick);
+					drawCharacter();
+				};
+
+				return { showGame, showTheGame, canvasRef, redirectToAppStore };
+			}
+		};
+
+		// Create and mount the Vue app
+		createApp(App).mount('#app');
+	</script>
+
+	
+</body>
+
+</html>
