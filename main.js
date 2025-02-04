@@ -63,15 +63,15 @@ scene.add(directionalLight);
 // Load the texture using TextureLoader
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load(
-  'assets/Building.png',
-  (loadedTexture) => {
-    console.log('Texture loaded successfully');
-    loadedTexture.encoding = THREE.sRGBEncoding;
-  },
-  undefined,
-  (err) => {
-    console.error('Error loading texture:', err);
-  }
+	'assets/Building.png',
+	(loadedTexture) => {
+		console.log('Texture loaded successfully');
+		loadedTexture.encoding = THREE.sRGBEncoding;
+	},
+	undefined,
+	(err) => {
+		console.error('Error loading texture:', err);
+	}
 );
 
 //create ground
@@ -81,7 +81,7 @@ groundLoader.load(
 	(object) => {
 		object.traverse(function (child) {
 			if (child.isMesh) {
-				
+
 				// child.material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
 
 				// Make sure the material is set to a proper shader
@@ -317,10 +317,8 @@ var render = function () {
 render();
 
 var updateEngineButton = function () {
-	if (engineOn)
-		document.getElementById("img-engine").src = "/assets/engineOn.png";
-	else
-		document.getElementById("img-engine").src = "/assets/engineOff.png";
+	document.getElementById("img-engine-off").style.display = engineOn ? 'none' : 'block'
+	document.getElementById("img-engine-on").style.display = engineOn ? 'block' : 'none'
 }
 
 window.toggleEngine = function () {
