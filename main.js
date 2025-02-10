@@ -1,22 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
-
-
-var showTutorial = true;
-// Get the tutorial screen element
-const tutorialScreen = document.getElementById('tutorialScreen');
-const endScreen = document.getElementById('endScreen');
-const loadingScreen = document.getElementById('loadingScreen');
-
-// Create an empty scene
-var scene = new THREE.Scene();
-
-// Create a basic perspective camera
-var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.y = 1;
-camera.position.z = 5;
-camera.rotation.x = -0.05
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 // Select the canvas from the document
 var canvReference = document.getElementById("gameCanvas");
@@ -35,6 +20,28 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Append Renderer to DOM
 document.body.appendChild(renderer.domElement);
+
+
+var showTutorial = true;
+// Get the tutorial screen element
+const tutorialScreen = document.getElementById('tutorialScreen');
+const endScreen = document.getElementById('endScreen');
+const loadingScreen = document.getElementById('loadingScreen');
+
+// Create an empty scene
+var scene = new THREE.Scene();
+
+// Create a basic perspective camera
+var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+// camera.position.y = 1;
+// camera.position.z = 5;
+// camera.rotation.x = -0.05
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+
+camera.position.set(5, 5, 10);
+orbit.update();
+
 
 // ------------------------------------------------
 // FUN STARTS HERE
@@ -77,7 +84,7 @@ const texture = textureLoader.load(
 //create ground
 const groundLoader = new FBXLoader()
 groundLoader.load(
-	'assets/Building.fbx',
+	'assets/Garage_01.fbx',
 	(object) => {
 		object.traverse(function (child) {
 			if (child.isMesh) {
@@ -97,8 +104,8 @@ groundLoader.load(
 
 		let scale = 0.03;
 		object.scale.set(scale, scale, scale)
-		object.position.y = -68
-		object.rotation.y = 3.13
+		// object.position.y = -68
+		// object.rotation.y = 3.13
 	},
 	(xhr) => {
 		// console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
@@ -109,82 +116,19 @@ groundLoader.load(
 )
 
 
-var parkingSpot;
+// Create an empty object (a parent container)
+var parkingSpot = new THREE.Object3D();
+parkingSpot.position.set(0, 0, -40);
+scene.add(parkingSpot);  // Add the empty object to the scene
+
 const parkingLoader = new FBXLoader()
 parkingLoader.load(
-	'assets/ParkingSpot.fbx',
+	'assets/Point_Area.fbx',
 	(object) => {
-		object.traverse((child) => {
-			if (child.isMesh) {
 
-				/* const material = new THREE.MeshStandardMaterial({
-					color: 0xFF7F00,
-					transparent: true,  // Enable transparency
-					opacity: 0.5       // Set opacity (0.0 is fully transparent, 1.0 is fully opaque)
-				}); */
+		object.scale.set(.008, .008, .008)
 
-				// Gradient shader with opacity
-				const vertexShader = `
-				void main() {
-				  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-				}
-			  `;
-
-				const fragmentShader = `
-				uniform vec3 color1;
-				uniform vec3 color2;
-				uniform float opacityStart;
-				uniform float opacityEnd;
-		
-				void main() {
-				  // Create a gradient based on the fragment's position (Y-axis)
-				  float gradient = gl_FragCoord.y / 600.0; // Adjust for screen height
-		
-				  // Interpolate colors
-				  vec3 color = mix(color1, color2, gradient); 
-		
-				  // Interpolate opacity based on the same gradient
-				  float opacity = mix(opacityStart, opacityEnd, gradient); 
-		
-				  gl_FragColor = vec4(color, opacity);
-				}
-			  `;
-
-				// Create geometry (plane)
-				const geometry = new THREE.PlaneGeometry(5, 5);
-
-				// Create shader material with opacity
-				const material = new THREE.ShaderMaterial({
-					vertexShader: vertexShader,
-					fragmentShader: fragmentShader,
-					uniforms: {
-						color1: { value: new THREE.Color(0xFF7F00) },
-						color2: { value: new THREE.Color(0xFFFD00) },
-						opacityStart: { value: 1.0 }, // Start opacity (fully opaque)
-						opacityEnd: { value: 0.0 }    // End opacity (fully transparent)
-					},
-					transparent: true // Allow transparency
-				});
-				child.material = material;
-
-				// child.material = new THREE.MeshStandardMaterial({ color: 0xFF7F00 });
-				// child.material.map = new THREE.TextureLoader().load('assets/ParkingSpot.jpg');
-
-				// Make sure the material is updated
-				child.material.needsUpdate = true;
-
-
-				// access and modify the materials here
-				// console.log(child.material);  // Log the material of each mesh
-			}
-		});
-
-		scene.add(object)
-
-		object.scale.set(.04, .04, .04)
-		object.position.set(0, -1, -20);
-
-		parkingSpot = object;
+		parkingSpot.add(object)
 	},
 	(xhr) => {
 		console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
@@ -202,7 +146,7 @@ scene.add(car3D);  // Add the empty object to the scene
 
 const fbxLoader = new FBXLoader()
 fbxLoader.load(
-	'assets/Car.fbx',
+	'assets/SUV-D.fbx',
 	(object) => {
 		// object.traverse(function (child) {
 		//     if ((child as THREE.Mesh).isMesh) {
@@ -215,13 +159,14 @@ fbxLoader.load(
 
 		car3D.add(object)
 
-		let modelScale = 0.02;
+		let modelScale = 0.015;
 
 		object.scale.set(modelScale, modelScale, modelScale)
-		object.position.x = 1.5
-		object.position.y = -1
-		object.position.z = -4
-		object.rotation.z = 3.13
+		// object.position.x = 1.5
+		// object.position.y = -1
+		// object.position.z = -4
+		object.rotation.y = Math.PI
+		// object.rotation.z = 3.13
 
 		//if done loading car
 		loadingScreen.style.display = 'none'; // hide loading
@@ -277,24 +222,26 @@ var render = function () {
 		}
 
 
-		// Smooth camera follow
-		const followDistance = 8; // Distance behind the model
-		const heightOffset = 2; // Height offset above the model
-
-		// Calculate the target camera position (behind the model)
-		const cameraOffset = new THREE.Vector3(0, heightOffset, followDistance); // Local offset in model space
-		cameraOffset.applyQuaternion(car3D.quaternion); // Rotate to align with model's orientation
-		targetCameraPosition.copy(car3D.position).add(cameraOffset);
-
-		// Interpolate (lerp) the camera's position for smooth movement
-		camera.position.lerp(targetCameraPosition, 0.05);
-
-		// Set the camera to look at the model
-		targetCameraLookAt.copy(car3D.position);
-		targetCameraLookAt.y += 2; //add offset
-		camera.lookAt(targetCameraLookAt);
-
 		if (engineOn) {
+			// Smooth camera follow
+			const followDistance = 12; // Distance behind the model
+			const heightOffset = 6; // Height offset above the model
+
+			// Calculate the target camera position (behind the model)
+			const cameraOffset = new THREE.Vector3(0, heightOffset, followDistance); // Local offset in model space
+			cameraOffset.applyQuaternion(car3D.quaternion); // Rotate to align with model's orientation
+			targetCameraPosition.copy(car3D.position).add(cameraOffset);
+
+			// Interpolate (lerp) the camera's position for smooth movement
+			camera.position.lerp(targetCameraPosition, 0.05);
+
+			// Set the camera to look at the model
+			targetCameraLookAt.copy(car3D.position);
+			targetCameraLookAt.y += 2; //add offset
+			camera.lookAt(targetCameraLookAt);
+
+
+			//handle Gas
 			if (isPressingGas) {
 				if (velocity.forward < 0.1)
 					velocity.forward += 0.0005; // Forward/backward movement
