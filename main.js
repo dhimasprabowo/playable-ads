@@ -39,6 +39,10 @@ var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHei
 
 const orbit = new OrbitControls(camera, renderer.domElement);
 
+// Limit the camera movement
+orbit.minPolarAngle = Math.PI / 6; // Limit up angle (in radians)
+orbit.maxPolarAngle = Math.PI / 2.2; // Limit ground (in radians)
+
 camera.position.set(5, 5, 10);
 orbit.update();
 
@@ -60,12 +64,12 @@ skyLoader.load('assets/sky.jpg', function (texture) {
 });
 
 // Add a light
-const light = new THREE.AmbientLight(0x404040, 10);  // Soft white light
+const light = new THREE.AmbientLight(0x404040, 50);  // Soft white light
 scene.add(light);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+/* const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
 directionalLight.position.set(5, 5, 5).normalize();
-scene.add(directionalLight);
+scene.add(directionalLight); */
 
 // Load the texture using TextureLoader
 const textureLoader = new THREE.TextureLoader();
