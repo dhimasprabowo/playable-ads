@@ -127,10 +127,10 @@ scene.add(parkingSpot);  // Add the empty object to the scene
 
 const parkingLoader = new FBXLoader()
 parkingLoader.load(
-	'assets/Point_Area.fbx',
+	'assets/ParkingSpot.fbx',
 	(object) => {
-
-		object.scale.set(.008, .008, .008)
+		let scaleObj = 0.03;
+		object.scale.set(scaleObj, scaleObj, scaleObj)
 
 		parkingSpot.add(object)
 	},
@@ -282,6 +282,19 @@ window.toggleEngine = function () {
 	//hide tutorial
 	showTutorial = false;
 	tutorialScreen.style.display = 'none'; // Hide tutorial screen
+
+	if (engineOn) {
+		document.getElementById('engineOnSound').play();
+		// Add event listener for when the sound finishes playing
+		document.getElementById('engineOnSound').addEventListener('ended', () => {
+			document.getElementById('engineLoopSound').play();
+		});
+
+	} else {
+		document.getElementById('engineOffSound').play();
+		document.getElementById('engineLoopSound').pause();
+	}
+
 }
 
 window.pressGas = function () {
