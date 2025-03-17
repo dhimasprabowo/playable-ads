@@ -21,7 +21,7 @@ orbit.minPolarAngle = Math.PI / 6; // Limit up angle (in radians)
 orbit.maxPolarAngle = Math.PI / 2.2; // Limit ground (in radians)
 orbit.update();
 
-const SHOW_HELPER = true;
+const SHOW_HELPER = false;
 
 if (SHOW_HELPER) {
 	const gridHelper = new THREE.GridHelper(50, 50);
@@ -99,7 +99,7 @@ scene.add(car3D);  // Add the empty object to the scene
 
 const fbxLoader = new FBXLoader()
 fbxLoader.load(
-	'assets/SUV-D.fbx',
+	'assets/SUV.fbx',
 	(object) => {
 		car3D.add(object)
 
@@ -108,7 +108,7 @@ fbxLoader.load(
 		object.scale.set(modelScale, modelScale, modelScale)
 		// object.position.x = 1.5
 		object.position.y = -1.2
-		object.position.z = -0.5
+		object.position.z = -0.45
 		// object.rotation.y = Math.PI
 		// object.rotation.z = 3.13
 
@@ -148,39 +148,50 @@ groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Directly set the rota
 world.addBody(groundBody);
 
 // Walls
-/* var wallBodies = [];
+var wallBodies = [];
 var wallMeshes = [];
 const wallData = [
-	{ w: 1, h: 1, d: 3, posX: -10, posY: 8, posZ: 0 }
+	{ w: 1, h: 100, d: 10, posX: 45, posY: 5, posZ: 0 },
+	{ w: 1, h: 100, d: 10, posX: -45, posY: 5, posZ: 0 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 45 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -45 },
 ]
 
 for (let i = 0; i < wallData.length; i++) {
-	
-	const wall = new CANNON.Body({
-		mass: 5,
-		material: new CANNON.Material(),
-		shape: new CANNON.Box(new CANNON.Vec3(wallData[i].w, wallData[i].h, wallData[i].d)),
-		position: new CANNON.Vec3(wallData[i].posX, wallData[i].posY, wallData[i].posZ)
-	});
-	wall.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Directly set the rotation of the ground body
-	world.addBody(wall);
-	wallBodies.push(wall)
+    const wall = new CANNON.Body({
+        mass: 0,
+        material: new CANNON.Material(),
+        shape: new CANNON.Box(new CANNON.Vec3(wallData[i].w / 2, wallData[i].h / 2, wallData[i].d / 2)),
+        position: new CANNON.Vec3(wallData[i].posX, wallData[i].posY, wallData[i].posZ)
+    });
 
-	const wallMesh = new THREE.Mesh(
-		new THREE.BoxGeometry(wallData[i].w, wallData[i].h, wallData[i].d, 32),
-		new THREE.MeshBasicMaterial({ color: 0x0000ff })
-	);
-	scene.add(wallMesh);
-	wallMeshes.push(wallMesh)
-} */
+    // Apply rotation to the physics body
+    wall.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+
+    // Add to the world
+    world.addBody(wall);
+    wallBodies.push(wall);
+
+    // Create and add the mesh for visual representation
+    const wallMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(wallData[i].w, wallData[i].h, wallData[i].d),
+        new THREE.MeshBasicMaterial({ color: 0x0000ff })
+    );
+
+	if(SHOW_HELPER)  
+		scene.add(wallMesh);
+   
+    wallMeshes.push(wallMesh);
+}
 
 function updateWallMeshesPos() {
-	/* for (let i = 0; i < wallMeshes.length; i++) {
-		wallMeshes[i].position.copy(wallBodies[i].position);
-		wallMeshes[i].quaternion.copy(wallBodies[i].quaternion);
-		wallMeshes[i].scale.set(wallData[i].w, wallData[i].h, wallData[i].d); 
-	} */
+    for (let i = 0; i < wallBodies.length; i++) {
+        // Sync position and rotation
+        wallMeshes[i].position.copy(wallBodies[i].position);
+        wallMeshes[i].quaternion.copy(wallBodies[i].quaternion);
+    }
 }
+
 
 
 // Load texture for the wheels
@@ -188,14 +199,14 @@ const textureWheelLoader = new THREE.TextureLoader();
 const wheelTexture = textureWheelLoader.load('assets/Point_Pole.png'); // Load the texture
 
 // Create materials for wheels and rods
-const rodWidth = 2.4;
+const rodWidth = 2.5;
 const rodHeight = 1;
 const rodSize = 6;
 const wheelMaterial = new CANNON.Material('wheel');
 const rodMaterial = new CANNON.Material();
 const wheelThickness = 0.3;
 const wheelRadius = 0.6;
-const offsetXWheel = rodWidth / 2 + 0.25;
+const offsetXWheel = rodWidth / 2 ;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
 const posYStart = 0.85;
@@ -210,7 +221,6 @@ const wheelPositions = [
 
 // Create arrays for wheels and wheel meshes
 const wheels = [];
-const wheelMeshes = [];
 
 // Loop to create wheels and wheel meshes
 for (let i = 0; i < wheelPositions.length; i++) {
@@ -224,14 +234,6 @@ for (let i = 0; i < wheelPositions.length; i++) {
 	wheel.position.set(wheelPositions[i].x, wheelPositions[i].y, wheelPositions[i].z);
 	world.addBody(wheel);
 	wheels.push(wheel);
-
-	// Three.js wheel mesh creation
-	const wheelMesh = new THREE.Mesh(
-		new THREE.CylinderGeometry(wheelRadius, wheelRadius, wheelThickness, 32),
-		new THREE.MeshBasicMaterial({ map: wheelTexture })
-	);
-	scene.add(wheelMesh);
-	wheelMeshes.push(wheelMesh);
 }
 
 // Create a contact material between the ground and the wheels
@@ -247,11 +249,48 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 // Add the contact material to the world
 world.addContactMaterial(wheelGroundContactMaterial);
 
+//handle wheels model
+var wheelsModel = []
+for (let i = 0; i < wheelPositions.length; i++) {
+	const fbxLoaderWheel = new FBXLoader()
+	fbxLoaderWheel.load(
+		'assets/Wheel-R.fbx',
+		(object) => {
+			//create container
+			var wheelObj = new THREE.Object3D();
+			scene.add(wheelObj);  // Add the empty object to the scene
+
+			wheelObj.add(object)
+
+			let modelScale = 0.015;
+
+			object.scale.set(modelScale, modelScale, modelScale)
+			// object.position.x = 1.5
+			// object.position.y = -1.2
+			// object.position.z = -0.5
+			// object.rotation.y = Math.PI
+			if (wheelPositions[i].x > 0)
+				object.rotation.z = Math.PI / 2
+			else
+				object.rotation.z = -Math.PI / 2
+
+			wheelsModel.push(wheelObj);
+		},
+		(xhr) => {
+			let progress = (xhr.loaded / xhr.total) * 100;
+			// console.log(progress + '% loaded')
+		},
+		(error) => {
+			console.log(error)
+		}
+	)
+}
+
 // Connecting rod (Cannon.js & Three.js)
 const rod = new CANNON.Body({
 	mass: 200,
 	material: rodMaterial,
-	shape: new CANNON.Box(new CANNON.Vec3(rodWidth, rodHeight, rodSize)),
+	shape: new CANNON.Box(new CANNON.Vec3(rodWidth/2, rodHeight/2, rodSize/2)),
 });
 rod.position.set(0, posYStart, 0);
 rod.linearDamping = 0.5;
@@ -298,16 +337,16 @@ for (let i = 0; i < wheelPositions.length; i++) {
 
 // Update Three.js objects from Cannon.js bodies
 function updateMeshesFromBodies() {
-	for (let i = 0; i < wheelPositions.length; i++) {
-		wheelMeshes[i].position.copy(wheels[i].position);
-		wheelMeshes[i].quaternion.copy(wheels[i].quaternion);
-	}
-
 	rodMesh.position.copy(rod.position);
 	rodMesh.quaternion.copy(rod.quaternion);
 
 	car3D.position.copy(rod.position);
 	car3D.quaternion.copy(rod.quaternion);
+
+	for (let i = 0; i < wheelsModel.length; i++) {
+		wheelsModel[i].position.copy(wheels[i].position);
+		wheelsModel[i].quaternion.copy(wheels[i].quaternion);
+	}
 }
 
 var engineOn = false;
