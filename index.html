@@ -21,16 +21,19 @@
 
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
 	<!-- <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r92/examples/js/loaders/GLTFLoader.js"></script> -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script> -->
 	<script src="https://cdn.tailwindcss.com"></script>
-	<!-- <canvas id="gameCanvas" width="300" height="500"></canvas> -->
 
 
   <script type="module" crossorigin src="/assets/index-BmF2PRMS.js"></script>
 </head>
 
 <body>
-	<canvas id="gameCanvas"></canvas>
+	<audio id="engineOnSound" src="/assets/Engine_start.ogg"></audio>
+	<audio id="engineLoopSound" src="/assets/engine.wav" loop></audio>
+	<audio id="engineOffSound" src="/assets/Engine_stop.ogg"></audio>
+
+	<!-- <canvas id="gameCanvas"></canvas> -->
 	<div id="tutorialScreen" class="absolute left-[5%] top-[55%]">
 		<div class="animate-bounce">
 			<img src="/assets/hand-Ca-oVv88.png">
