@@ -1,10 +1,12 @@
 {
 	"dependencies": {
+		"cannon-es": "^0.20.0",
 		"three": "^0.172.0",
 		"threejs-fbxloader": "^0.0.1"
 	},
 	"devDependencies": {
-		"vite": "^6.0.10"
+		"vite": "^6.0.10",
+		"vite-plugin-wasm": "^3.4.1"
 	},
 	"scripts": {
 		"dev": "vite",

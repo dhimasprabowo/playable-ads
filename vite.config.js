@@ -1,5 +1,12 @@
 // vite.config.js
-export default {
-	base: '/playable-ads/',  // Replace with repo name
-  }
-  
+import { defineConfig } from 'vite';
+import wasm from 'vite-plugin-wasm';
+
+export default defineConfig({
+	plugins: [
+		wasm(),
+	],
+	vite: {
+		plugins: [wasm()],
+	},
+});
