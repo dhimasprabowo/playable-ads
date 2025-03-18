@@ -12,8 +12,8 @@ document.body.appendChild(renderer.domElement);
 
 // Setup camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(10, 10, 10); // Increase the Z position to move the camera further away from the car
-camera.lookAt(new THREE.Vector3(0, 0, 0));
+// camera.position.set(10, 10, 10); // Increase the Z position to move the camera further away from the car
+// camera.lookAt(new THREE.Vector3(0, 0, 0));
 const orbit = new OrbitControls(camera, renderer.domElement);
 
 // Limit the camera movement
@@ -51,7 +51,7 @@ scene.add(light);
 // Load the texture using TextureLoader
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load(
-	'assets/Building.png',
+	'assets/Garage_01.png',
 	(loadedTexture) => {
 		console.log('Texture loaded successfully');
 		loadedTexture.encoding = THREE.sRGBEncoding;
@@ -62,9 +62,9 @@ const texture = textureLoader.load(
 	}
 );
 
-//create ground
-const groundLoader = new FBXLoader()
-groundLoader.load(
+//create garage
+const garageLoader = new FBXLoader()
+garageLoader.load(
 	'assets/Garage_01.fbx',
 	(object) => {
 		object.traverse(function (child) {
@@ -92,6 +92,74 @@ groundLoader.load(
 		console.log(error)
 	}
 )
+
+// Load the texture using TextureLoader
+const textureGroundLoader = new THREE.TextureLoader();
+const textureGround = textureGroundLoader.load(
+	'assets/Garage_01_Floor.png',
+	(loadedTexture) => {
+		console.log('Texture loaded successfully');
+		loadedTexture.encoding = THREE.sRGBEncoding;
+	},
+	undefined,
+	(err) => {
+		console.error('Error loading texture:', err);
+	}
+);
+
+//create garage
+const groundLoader = new FBXLoader()
+groundLoader.load(
+	'assets/Garage_01_Floor.fbx',
+	(object) => {
+		object.traverse(function (child) {
+			if (child.isMesh) {
+				// Make sure the material is set to a proper shader
+				child.material = new THREE.MeshStandardMaterial({
+					map: textureGround,      // Set the texture
+					metalness: 0.5,    // Adjust metalness if needed
+					roughness: 0.5,    // Adjust roughness if needed
+				});
+				child.material.needsUpdate = true; // Ensure the material is updated with the texture
+			}
+		})
+		scene.add(object)
+
+		let scale = 0.03;
+		object.scale.set(scale, scale, scale)
+		// object.position.y = -68
+		// object.rotation.y = 3.13
+	},
+	(xhr) => {
+		// console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+	},
+	(error) => {
+		console.log(error)
+	}
+)
+
+// Create an empty object (a parent container)
+var parkingSpot = new THREE.Object3D();
+parkingSpot.position.set(40, 0, 40);
+scene.add(parkingSpot);  // Add the empty object to the scene
+
+const parkingLoader = new FBXLoader()
+parkingLoader.load(
+	'assets/ParkingSpot.fbx',
+	(object) => {
+		let scaleObj = 0.03;
+		object.scale.set(scaleObj, scaleObj, scaleObj)
+
+		parkingSpot.add(object)
+	},
+	(xhr) => {
+		console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+	},
+	(error) => {
+		console.log(error)
+	}
+)
+
 
 // Create an empty object (a parent container)
 var car3D = new THREE.Object3D();
@@ -153,43 +221,43 @@ var wallMeshes = [];
 const wallData = [
 	{ w: 1, h: 100, d: 10, posX: 45, posY: 5, posZ: 0 },
 	{ w: 1, h: 100, d: 10, posX: -45, posY: 5, posZ: 0 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 45 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -45 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 46 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -46 },
 ]
 
 for (let i = 0; i < wallData.length; i++) {
-    const wall = new CANNON.Body({
-        mass: 0,
-        material: new CANNON.Material(),
-        shape: new CANNON.Box(new CANNON.Vec3(wallData[i].w / 2, wallData[i].h / 2, wallData[i].d / 2)),
-        position: new CANNON.Vec3(wallData[i].posX, wallData[i].posY, wallData[i].posZ)
-    });
+	const wall = new CANNON.Body({
+		mass: 0,
+		material: new CANNON.Material(),
+		shape: new CANNON.Box(new CANNON.Vec3(wallData[i].w / 2, wallData[i].h / 2, wallData[i].d / 2)),
+		position: new CANNON.Vec3(wallData[i].posX, wallData[i].posY, wallData[i].posZ)
+	});
 
-    // Apply rotation to the physics body
-    wall.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+	// Apply rotation to the physics body
+	wall.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 
-    // Add to the world
-    world.addBody(wall);
-    wallBodies.push(wall);
+	// Add to the world
+	world.addBody(wall);
+	wallBodies.push(wall);
 
-    // Create and add the mesh for visual representation
-    const wallMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(wallData[i].w, wallData[i].h, wallData[i].d),
-        new THREE.MeshBasicMaterial({ color: 0x0000ff })
-    );
+	// Create and add the mesh for visual representation
+	const wallMesh = new THREE.Mesh(
+		new THREE.BoxGeometry(wallData[i].w, wallData[i].h, wallData[i].d),
+		new THREE.MeshBasicMaterial({ color: 0x0000ff })
+	);
 
-	if(SHOW_HELPER)  
+	if (SHOW_HELPER)
 		scene.add(wallMesh);
-   
-    wallMeshes.push(wallMesh);
+
+	wallMeshes.push(wallMesh);
 }
 
 function updateWallMeshesPos() {
-    for (let i = 0; i < wallBodies.length; i++) {
-        // Sync position and rotation
-        wallMeshes[i].position.copy(wallBodies[i].position);
-        wallMeshes[i].quaternion.copy(wallBodies[i].quaternion);
-    }
+	for (let i = 0; i < wallBodies.length; i++) {
+		// Sync position and rotation
+		wallMeshes[i].position.copy(wallBodies[i].position);
+		wallMeshes[i].quaternion.copy(wallBodies[i].quaternion);
+	}
 }
 
 
@@ -206,18 +274,36 @@ const wheelMaterial = new CANNON.Material('wheel');
 const rodMaterial = new CANNON.Material();
 const wheelThickness = 0.3;
 const wheelRadius = 0.6;
-const offsetXWheel = rodWidth / 2 ;
+const offsetXWheel = rodWidth / 2;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
-const posYStart = 0.85;
+
+const posStart = { x: 0, y: 1.5, z: -30 };
+
+//set camera based on starting pos
+camera.position.set(posStart.x + 10, 10, posStart.z + 10);
+camera.lookAt(new THREE.Vector3(posStart.x, 0, posStart.z));
+orbit.target.set(posStart.x, 0, posStart.z)
+orbit.update();
 
 // Number of wheels and positions
-const wheelPositions = [
-	{ x: -offsetXWheel, y: posYStart, z: offsetZWheel }, // Position for wheel 1
-	{ x: offsetXWheel, y: posYStart, z: offsetZWheel },   // Position for wheel 2
-	{ x: -offsetXWheel, y: posYStart, z: -offsetZWheel },   // Position for wheel 3
-	{ x: offsetXWheel, y: posYStart, z: -offsetZWheel },   // Position for wheel 4
+const wheelLocalPositions = [
+	{ x: -offsetXWheel, y: offsetYWheel, z: offsetZWheel }, // Position for wheel 1
+	{ x: offsetXWheel, y: offsetYWheel, z: offsetZWheel },   // Position for wheel 2
+	{ x: -offsetXWheel, y: offsetYWheel, z: -offsetZWheel },   // Position for wheel 3
+	{ x: offsetXWheel, y: offsetYWheel, z: -offsetZWheel },   // Position for wheel 4
 ];
+
+const wheelPositions = [];
+for (let i = 0; i < wheelLocalPositions.length; i++) {
+	wheelPositions.push(
+		{
+			x: wheelLocalPositions[i].x + posStart.x,
+			y: wheelLocalPositions[i].y + posStart.y,
+			z: wheelLocalPositions[i].z + posStart.z,
+		}
+	)
+}
 
 // Create arrays for wheels and wheel meshes
 const wheels = [];
@@ -251,7 +337,7 @@ world.addContactMaterial(wheelGroundContactMaterial);
 
 //handle wheels model
 var wheelsModel = []
-for (let i = 0; i < wheelPositions.length; i++) {
+for (let i = 0; i < wheelLocalPositions.length; i++) {
 	const fbxLoaderWheel = new FBXLoader()
 	fbxLoaderWheel.load(
 		'assets/Wheel-R.fbx',
@@ -265,11 +351,7 @@ for (let i = 0; i < wheelPositions.length; i++) {
 			let modelScale = 0.015;
 
 			object.scale.set(modelScale, modelScale, modelScale)
-			// object.position.x = 1.5
-			// object.position.y = -1.2
-			// object.position.z = -0.5
-			// object.rotation.y = Math.PI
-			if (wheelPositions[i].x > 0)
+			if (wheelLocalPositions[i].x < 0)
 				object.rotation.z = Math.PI / 2
 			else
 				object.rotation.z = -Math.PI / 2
@@ -290,9 +372,9 @@ for (let i = 0; i < wheelPositions.length; i++) {
 const rod = new CANNON.Body({
 	mass: 200,
 	material: rodMaterial,
-	shape: new CANNON.Box(new CANNON.Vec3(rodWidth/2, rodHeight/2, rodSize/2)),
+	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
 });
-rod.position.set(0, posYStart, 0);
+rod.position.set(posStart.x, posStart.y, posStart.z);
 rod.linearDamping = 0.5;
 
 world.addBody(rod);
@@ -310,29 +392,18 @@ const axisWheel = new CANNON.Vec3(0, 1, 0); // Axis of rotation (vertical axis)
 const axisRod = new CANNON.Vec3(1, 0, 0); // Axis of rotation (horizontal axis)
 
 // Loop to create hinge joints for each wheel
-for (let i = 0; i < wheelPositions.length; i++) {
-	//front wheels
-	if (i < 2) {
-		const offsetX = wheelPositions[i].x > 0 ? offsetXWheel : -offsetXWheel;
-		const hinge = new CANNON.HingeConstraint(wheels[i], rod, {
-			pivotA: new CANNON.Vec3(0, 0, 0),
-			pivotB: new CANNON.Vec3(offsetX, offsetYWheel, wheelPositions[i].z),
-			axisA: new CANNON.Vec3(0, 1, 0),
-			axisB: new CANNON.Vec3(1, 0, 0),
-		});
-		world.addConstraint(hinge);
-	}
-	//back wheels
-	if (i >= 2) {
-		const offsetX = wheelPositions[i].x > 0 ? offsetXWheel : -offsetXWheel;
-		const hinge = new CANNON.HingeConstraint(wheels[i], rod, {
-			pivotA: new CANNON.Vec3(0, 0, 0),
-			pivotB: new CANNON.Vec3(offsetX, offsetYWheel, wheelPositions[i].z),
-			axisA: axisWheel,
-			axisB: axisRod,
-		});
-		world.addConstraint(hinge);
-	}
+for (let i = 0; i < wheelLocalPositions.length; i++) {
+	const offsetX = wheelLocalPositions[i].x < 0 ? offsetXWheel : -offsetXWheel;
+	const offsetZ = i < 2 ? offsetZWheel : -offsetZWheel; //pos Z for front or back wheels
+
+	const hinge = new CANNON.HingeConstraint(wheels[i], rod, {
+		pivotA: new CANNON.Vec3(0, 0, 0),
+		pivotB: new CANNON.Vec3(offsetX, offsetYWheel, offsetZ),
+		axisA: axisWheel,
+		axisB: axisRod,
+	});
+
+	world.addConstraint(hinge);
 }
 
 // Update Three.js objects from Cannon.js bodies

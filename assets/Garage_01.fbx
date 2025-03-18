@@ -7,12 +7,12 @@ FBXHeaderExtension:  {
 	CreationTimeStamp:  {
 		Version: 1000
 		Year: 2025
-		Month: 2
-		Day: 10
+		Month: 3
+		Day: 18
 		Hour: 14
-		Minute: 34
-		Second: 25
-		Millisecond: 5
+		Minute: 42
+		Second: 12
+		Millisecond: 655
 	}
 	Creator: "FBX SDK/FBX Plugins version 2020.3.2"
 	SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
@@ -28,8 +28,8 @@ FBXHeaderExtension:  {
 			Comment: ""
 		}
 		Properties70:  {
-			P: "DocumentUrl", "KString", "Url", "", "E:\Documents\Repository\playable-ads\assets\yb98afzx_Garage_01.fbx"
-			P: "SrcDocumentUrl", "KString", "Url", "", "E:\Documents\Repository\playable-ads\assets\yb98afzx_Garage_01.fbx"
+			P: "DocumentUrl", "KString", "Url", "", "E:\Documents\Repository\playable-ads\assets\qis7wuej_Garage_01.fbx"
+			P: "SrcDocumentUrl", "KString", "Url", "", "E:\Documents\Repository\playable-ads\assets\qis7wuej_Garage_01.fbx"
 			P: "Original", "Compound", "", ""
 			P: "Original|ApplicationVendor", "KString", "", "", ""
 			P: "Original|ApplicationName", "KString", "", "", "Unity FBX Exporter"
@@ -75,7 +75,7 @@ GlobalSettings:  {
 
 Documents:  {
 	Count: 1
-	Document: 2271771992528, "Scene", "Scene" {
+	Document: 1522162337248, "Scene", "Scene" {
 		Properties70:  {
 			P: "SourceObject", "object", "", ""
 			P: "ActiveAnimStackName", "KString", "", "", ""
@@ -95,12 +95,12 @@ References:  {
 
 Definitions:  {
 	Version: 100
-	Count: 11
+	Count: 6
 	ObjectType: "GlobalSettings" {
 		Count: 1
 	}
 	ObjectType: "Model" {
-		Count: 2
+		Count: 1
 		PropertyTemplate: "FbxNode" {
 			Properties70:  {
 				P: "QuaternionInterpolate", "enum", "", "",0
@@ -178,7 +178,7 @@ Definitions:  {
 		}
 	}
 	ObjectType: "Geometry" {
-		Count: 2
+		Count: 1
 		PropertyTemplate: "FbxMesh" {
 			Properties70:  {
 				P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
@@ -191,7 +191,7 @@ Definitions:  {
 		}
 	}
 	ObjectType: "Material" {
-		Count: 2
+		Count: 1
 		PropertyTemplate: "FbxSurfaceLambert" {
 			Properties70:  {
 				P: "ShadingModel", "KString", "", "", "Lambert"
@@ -215,7 +215,7 @@ Definitions:  {
 		}
 	}
 	ObjectType: "Texture" {
-		Count: 2
+		Count: 1
 		PropertyTemplate: "FbxFileTexture" {
 			Properties70:  {
 				P: "TextureTypeUse", "enum", "", "",0
@@ -238,7 +238,7 @@ Definitions:  {
 		}
 	}
 	ObjectType: "Video" {
-		Count: 2
+		Count: 1
 		PropertyTemplate: "FbxVideo" {
 			Properties70:  {
 				P: "Path", "KString", "XRefUrl", "", ""
@@ -270,7 +270,7 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Geometry: 2275728320816, "Geometry::Scene", "Mesh" {
+	Geometry: 1526262868656, "Geometry::Scene", "Mesh" {
 		Vertices: *4122 {
 			a: -1499.99980926514,700.000047683716,14.9999663233757,-0,969.999980926514,14.9999544024467,-1469.99998092651,680.000066757202,14.9999633431435,-0,999.999904632568,14.9999544024467,-1469.99998092651,680.000162124634,-15.0000363588333,-0,1000,-15.0000423192978,-1499.99980926514,700.000190734863,-15.0000303983688,-0,970.000076293945,-15.0000467896461,-1400.00009536743,693.829011917114,-15.0000333786011,-1469.99998092651,680.000114440918,-15.0000393390656,-1469.99998092651,650.000190734863,-15.0000363588333,-1469.99998092651,650.000047683716,14.9999633431435,-1469.99998092651,680.000066757202,14.9999648332596,-1400.00009536743,693.828964233398,14.9999678134918,-0,940.000057220459,-15.0000438094139,-69.9999809265137,956.191062927246,-15.0000438094139,-69.9999809265137,956.190967559814,14.9999544024467,-0,939.999961853027,14.999957382679,-1499.99980926514,700.000095367432,815.000247955322,-0,969.999980926514,815.000057220459,-1469.99998092651,680.000114440918,815.000057220459,-0,1000,815.000057220459,-1469.99998092651,680.00020980835,785.000038146973,-0,1000.00009536743,785.000085830688,-1499.99980926514,700.000238418579,785.000276565552,-0,970.000076293945,785.000038146973,-1400.00009536743,693.829011917114,784.999990463257,-1469.99998092651,680.000114440918,784.999990463257,-1469.99998092651,650.000238418579,784.999990463257,-1469.99998092651,650.000095367432,814.999961853027,-1469.99998092651,680.000114440918,814.999961853027,-1400.00009536743,693.829011917114,814.999961853027,-0,940.000057220459,785.000038146973,-69.9999988079071,956.191158294678,785.000085830688,-69.9999988079071,956.191062927246,815.000057220459,-0,940.000057220459,815.000057220459,-1499.99980926514,699.999904632568,1600,-0,969.999885559082,1600,-1469.99998092651,679.999923706055,1599.99971389771,-0,999.999809265137,1600,-1469.99998092651,680.000066757202,1569.99969482422,-0,999.999904632568,1569.99998092651,-1499.99980926514,700.000047683716,1569.99998092651,-0,969.999885559082,1569.99998092651,-1400.00009536743,693.828916549683,1569.99959945679,
 -1469.99998092651,679.999971389771,1569.99969482422,-1469.99998092651,650.000047683716,1569.99969482422,-1469.99998092651,649.999904632568,1599.99971389771,-1400.00009536743,693.828821182251,1599.99961853027,-0,939.999961853027,1569.99969482422,-69.9999988079071,956.190967559814,1569.99950408936,-69.9999988079071,956.190872192383,1599.99952316284,-0,939.999866485596,1599.99971389771,-1499.99980926514,700,-784.999322891235,-0,969.999885559082,-784.99960899353,-1469.99998092651,679.999971389771,-784.999799728394,-0,999.999809265137,-784.999513626099,-1469.99998092651,680.000114440918,-814.999771118164,-0,1000,-814.999485015869,-1499.99980926514,700.000095367432,-814.999294281006,-0,969.999980926514,-814.999580383301,-1400.00009536743,693.829011917114,-814.999771118164,-1469.99998092651,650.000095367432,-814.999771118164,-1469.99998092651,650,-784.999799728394,-1400.00009536743,693.828916549683,-784.999799728394,-0,939.999961853027,-814.999771118164,-69.9999988079071,956.191062927246,-814.999675750732,-69.9999988079071,956.190872192383,-784.999656677246,-0,939.999961853027,-784.999752044678,-1499.99980926514,700,-1569.99998092651,-0,969.999885559082,-1570.00017166138,-1469.99998092651,679.999971389771,-1570.00036239624,-0,999.999809265137,-1569.99998092651,-1469.99998092651,680.000114440918,-1600.00038146973,-0,1000,-1600,-1499.99980926514,700.000095367432,-1600,-0,969.999980926514,-1600.00019073486,-1400.00009536743,693.828916549683,-1600.00038146973,-1469.99998092651,679.999971389771,-1600.00038146973,-1469.99998092651,650.000047683716,-1600.00038146973,-1469.99998092651,650,-1570.00036239624,-1469.99998092651,679.999923706055,-1570.00036239624,-1400.00009536743,693.828916549683,-1570.00045776367,-0,939.999961853027,-1600.00038146973,-69.9999988079071,956.190967559814,-1600.00057220459,-69.9999988079071,956.190872192383,-1570.0005531311,-0,939.999866485596,-1570.00036239624,-735.00018119812,794.991016387939,-1570.00036239624,-735.00018119812,824.990940093994,-1570.00036239624,-665.000295639038,838.810062408447,-1570.00036239624,
@@ -612,97 +612,7 @@ Objects:  {
 			}
 		}
 	}
-	Geometry: 2275728330224, "Geometry::Scene", "Mesh" {
-		Vertices: *54 {
-			a: -0,-7.20247835981833e-12,-1200,-0,-6.51682853458624e-05,-2000,1500.00009536743,5.69020130569697e-05,-2000,-1500.00009536743,5.69020130569697e-05,-2000,1500.00009536743,0.000122070343877567,-1200,-0,6.51682796615205e-05,-399.999928474426,-1500.00009536743,0.000122070343877567,-1200,1500.00009536743,0.000187238617854746,-399.99988079071,-1500.00009536743,0.000187238617854746,-399.99988079071,1500.00009536743,0.000217756155507232,400,-1500.00009536743,0.000217756155507232,400,-0,6.51682853458624e-05,400.000047683716,1500.00009536743,0.000217756155507232,1200,-1500.00009536743,0.000217756155507232,1200,-0,6.51682853458624e-05,1200,1500.00009536743,0.000187238561011327,2000,-1500.00009536743,0.000187238561011327,2000,-0,6.5168256924153e-05,2000
-		} 
-		PolygonVertexIndex: *60 {
-			a: 0,2,-2,0,1,-4,0,4,-3,5,4,-1,0,3,-7,5,0,-7,5,7,-5,5,6,-9,9,7,-6,5,8,-11,9,5,-12,5,10,-12,12,9,-12,11,10,-14,12,11,-15,11,13,-15,14,15,-13,16,14,-14,14,17,-16,16,17,-15
-		} 
-		GeometryVersion: 124
-		LayerElementNormal: 0 {
-			Version: 102
-			Name: "Normals"
-			MappingInformationType: "ByPolygonVertex"
-			ReferenceInformationType: "Direct"
-			Normals: *180 {
-				a: -0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0
-			} 
-			NormalsW: *60 {
-				a: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-			} 
-		}
-		LayerElementBinormal: 0 {
-			Version: 102
-			Name: "Binormals"
-			MappingInformationType: "ByPolygonVertex"
-			ReferenceInformationType: "Direct"
-			Binormals: *180 {
-				a: 0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1,0,-0,1
-			} 
-			BinormalsW: *60 {
-				a: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-			} 
-
-		}
-		LayerElementTangent: 0 {
-			Version: 102
-			Name: "Tangents"
-			MappingInformationType: "ByPolygonVertex"
-			ReferenceInformationType: "Direct"
-			Tangents: *180 {
-				a: -1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0
-			} 
-			TangentsW: *60 {
-				a: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-			} 
-		}
-		LayerElementUV: 0 {
-			Version: 101
-			Name: "UVSet0"
-			MappingInformationType: "ByPolygonVertex"
-			ReferenceInformationType: "IndexToDirect"
-			UV: *36 {
-				a: 0.499999940395355,0.20320001244545,0.499999940395355,0.00400004535913467,0.126499891281128,0.00400004535913467,0.873499929904938,0.0039999857544899,0.126499891281128,0.20320001244545,0.499999940395355,0.402399986982346,0.873499929904938,0.203199952840805,0.126499906182289,0.402399986982346,0.873500049114227,0.402399927377701,0.12649992108345,0.601599991321564,0.873500049114227,0.601599991321564,0.499999940395355,0.601599991321564,0.12649992108345,0.800800025463104,0.873500049114227,0.800799965858459,0.5,0.800800025463104,0.126499935984612,1,0.873500049114227,1,0.5,1
-			} 
-			UVIndex: *60 {
-				a: 0,2,1,0,1,3,0,4,2,5,4,0,0,3,6,5,0,6,5,7,4,5,6,8,9,7,5,5,8,10,9,5,11,5,10,11,12,9,11,11,10,13,12,11,14,11,13,14,14,15,12,16,14,13,14,17,15,16,17,14
-			} 
-		}
-		LayerElementMaterial: 0 {
-			Version: 101
-			Name: "Material"
-			MappingInformationType: "AllSame"
-			ReferenceInformationType: "IndexToDirect"
-			Materials: *1 {
-				a: 0
-			} 
-		}
-		Layer: 0 {
-			Version: 100
-			LayerElement:  {
-				Type: "LayerElementNormal"
-				TypedIndex: 0
-			}
-			LayerElement:  {
-				Type: "LayerElementBinormal"
-				TypedIndex: 0
-			}
-			LayerElement:  {
-				Type: "LayerElementTangent"
-				TypedIndex: 0
-			}
-			LayerElement:  {
-				Type: "LayerElementMaterial"
-				TypedIndex: 0
-			}
-			LayerElement:  {
-				Type: "LayerElementUV"
-				TypedIndex: 0
-			}
-		}
-	}
-	Model: 2279031483664, "Model::Garage_01", "Mesh" {
+	Model: 1526263353648, "Model::Garage_01", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -714,19 +624,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 2279031493664, "Model::Garage_01_Floor", "Mesh" {
-		Version: 232
-		Properties70:  {
-			P: "RotationOrder", "enum", "", "",4
-			P: "RotationActive", "bool", "", "",1
-			P: "InheritType", "enum", "", "",1
-			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
-			P: "DefaultAttributeIndex", "int", "Integer", "",0
-		}
-		Shading: W
-		Culling: "CullingOff"
-	}
-	Material: 2279032258800, "Material::Garage_01", "" {
+	Material: 1526262687600, "Material::Garage_01", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -740,21 +638,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 2279032259600, "Material::Garage_01_Floor", "" {
-		Version: 102
-		ShadingModel: "lambert"
-		MultiLayer: 0
-		Properties70:  {
-			P: "AmbientColor", "Color", "", "A",0,0,0
-			P: "DiffuseColor", "Color", "", "A",1,1,1
-			P: "BumpFactor", "double", "Number", "",0
-			P: "Emissive", "Vector3D", "Vector", "",0,0,0
-			P: "Ambient", "Vector3D", "Vector", "",0,0,0
-			P: "Diffuse", "Vector3D", "Vector", "",1,1,1
-			P: "Opacity", "double", "Number", "",1
-		}
-	}
-	Video: 2271705025632, "Video::DiffuseColor_Texture", "Clip" {
+	Video: 1526243479424, "Video::DiffuseColor_Texture", "Clip" {
 		Type: "Clip"
 		Properties70:  {
 			P: "Path", "KString", "XRefUrl", "", "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01.png"
@@ -764,35 +648,13 @@ Objects:  {
 		Filename: "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01.png"
 		RelativeFilename: "..\..\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01.png"
 	}
-	Video: 2271705028032, "Video::DiffuseColor_Texture_1", "Clip" {
-		Type: "Clip"
-		Properties70:  {
-			P: "Path", "KString", "XRefUrl", "", "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
-			P: "RelPath", "KString", "XRefUrl", "", "..\..\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
-		}
-		UseMipMap: 0
-		Filename: "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
-		RelativeFilename: "..\..\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
-	}
-	Texture: 2271705028992, "Texture::DiffuseColor_Texture", "" {
+	Texture: 1526243477024, "Texture::DiffuseColor_Texture", "" {
 		Type: "TextureVideoClip"
 		Version: 202
 		TextureName: "Texture::DiffuseColor_Texture"
 		Media: "Video::DiffuseColor_Texture"
 		FileName: "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01.png"
 		RelativeFilename: "..\..\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01.png"
-		ModelUVTranslation: 0,0
-		ModelUVScaling: 1,1
-		Texture_Alpha_Source: "None"
-		Cropping: 0,0,0,0
-	}
-	Texture: 2271705027552, "Texture::DiffuseColor_Texture_1", "" {
-		Type: "TextureVideoClip"
-		Version: 202
-		TextureName: "Texture::DiffuseColor_Texture_1"
-		Media: "Video::DiffuseColor_Texture_1"
-		FileName: "E:\Documents\Repository\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
-		RelativeFilename: "..\..\bus-simulator-id-mobile-game-refactored\Assets\_RouteDesign\BUSSID\Textures\Building\Garage_01_Floor.tga"
 		ModelUVTranslation: 0,0
 		ModelUVScaling: 1,1
 		Texture_Alpha_Source: "None"
@@ -806,40 +668,22 @@ Objects:  {
 Connections:  {
 	
 	;Model::Garage_01, Model::RootNode
-	C: "OO",2279031483664,0
-	
-	;Model::Garage_01_Floor, Model::Garage_01
-	C: "OO",2279031493664,2279031483664
+	C: "OO",1526263353648,0
 	
 	;Material::Garage_01, Model::Garage_01
-	C: "OO",2279032258800,2279031483664
+	C: "OO",1526262687600,1526263353648
 	
 	;Geometry::Scene, Model::Garage_01
-	C: "OO",2275728320816,2279031483664
-	
-	;Material::Garage_01_Floor, Model::Garage_01_Floor
-	C: "OO",2279032259600,2279031493664
-	
-	;Geometry::Scene, Model::Garage_01_Floor
-	C: "OO",2275728330224,2279031493664
+	C: "OO",1526262868656,1526263353648
 	
 	;Texture::DiffuseColor_Texture, Material::Garage_01
-	C: "OO",2271705028992,2279032258800
+	C: "OO",1526243477024,1526262687600
 	
 	;Texture::DiffuseColor_Texture, Material::Garage_01
-	C: "OP",2271705028992,2279032258800, "DiffuseColor"
+	C: "OP",1526243477024,1526262687600, "DiffuseColor"
 	
 	;Video::DiffuseColor_Texture, Texture::DiffuseColor_Texture
-	C: "OO",2271705025632,2271705028992
-	
-	;Texture::DiffuseColor_Texture_1, Material::Garage_01_Floor
-	C: "OO",2271705027552,2279032259600
-	
-	;Texture::DiffuseColor_Texture_1, Material::Garage_01_Floor
-	C: "OP",2271705027552,2279032259600, "DiffuseColor"
-	
-	;Video::DiffuseColor_Texture_1, Texture::DiffuseColor_Texture_1
-	C: "OO",2271705028032,2271705027552
+	C: "OO",1526243479424,1526243477024
 }
 ;Takes section
 ;----------------------------------------------------
