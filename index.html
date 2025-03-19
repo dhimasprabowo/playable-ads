@@ -48,6 +48,10 @@
 				<img id="img-engine-off" src="/assets/engineOff.png" draggable="false">
 				<img id="img-engine-on" class="hidden" src="/assets/engineOn.png" draggable="false">
 			</button>
+			<button onclick="toggleGearPos()" class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
+				<img id="img-gear-drive" src="/assets/GearDrive.png" draggable="false">
+				<img id="img-gear-reverse" src="/assets/GearReverse.png" draggable="false">
+			</button>
 			<div class="absolute left-[5%] bottom-[20px] transform -translateY-1/2 flex gap-5">
 				<button onmousedown="pressLeft()" onmouseup="releaseArrow()" class="pointer-events-auto transition transform active:scale-90">
 					<img src="/assets/arrowLeft.png" draggable="false">

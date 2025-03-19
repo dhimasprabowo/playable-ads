@@ -221,8 +221,8 @@ var wallMeshes = [];
 const wallData = [
 	{ w: 1, h: 100, d: 10, posX: 45, posY: 5, posZ: 0 },
 	{ w: 1, h: 100, d: 10, posX: -45, posY: 5, posZ: 0 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 46 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -46 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 48 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -48 },
 ]
 
 for (let i = 0; i < wallData.length; i++) {
@@ -261,11 +261,6 @@ function updateWallMeshesPos() {
 }
 
 
-
-// Load texture for the wheels
-const textureWheelLoader = new THREE.TextureLoader();
-const wheelTexture = textureWheelLoader.load('assets/Point_Pole.png'); // Load the texture
-
 // Create materials for wheels and rods
 const rodWidth = 2.5;
 const rodHeight = 1;
@@ -281,7 +276,7 @@ const offsetZWheel = 2;
 const posStart = { x: 0, y: 1.5, z: -30 };
 
 //set camera based on starting pos
-camera.position.set(posStart.x + 10, 10, posStart.z + 10);
+camera.position.set(posStart.x + 10, 5, posStart.z + 10);
 camera.lookAt(new THREE.Vector3(posStart.x, 0, posStart.z));
 orbit.target.set(posStart.x, 0, posStart.z)
 orbit.update();
@@ -327,7 +322,7 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 	groundBodyMaterial,     // Ground material
 	wheelMaterial,      // Wheel material
 	{
-		friction: 0.8,   // Friction between ground and wheels (adjustable)
+		friction: 0.95,   // Friction between ground and wheels (adjustable)
 		restitution: 0  // Bounciness (not necessary for friction but can be adjusted)
 	}
 );
@@ -421,6 +416,7 @@ function updateMeshesFromBodies() {
 }
 
 var engineOn = false;
+var gearPosition = 'D'
 var showTutorial = true;
 
 // Get the screen element
@@ -438,9 +434,17 @@ let isTurningRight = false;
 window.addEventListener('keydown', (event) => {
 	if (event.key === 'ArrowUp' || event.key === 'w') {
 		isAccelerating = true;
+
+		//update UI
+		gearPosition = 'D';
+		updateGearButton();
 	}
 	if (event.key === 'ArrowDown' || event.key === 's') {
 		isBraking = true;
+
+		//update UI
+		gearPosition = 'R';
+		updateGearButton();
 	}
 	if (event.key === 'ArrowLeft' || event.key === 'a') {
 		isTurningLeft = true;
@@ -628,6 +632,17 @@ function animate() {
 
 	updateWallMeshesPos();
 
+	if (parkingSpot) {
+		// console.log(car3D.position.distanceTo(parkingSpot.position));
+		if (car3D.position.distanceTo(parkingSpot.position) < 2) {
+			// console.log("TRIGGER");
+			endScreen.style.display = 'block'; // show end game
+
+			engineOn = false;
+			updateEngineButton();
+		}
+	}
+
 	// Sync ground mesh with the physics body
 	groundMesh.quaternion.copy(groundBody.quaternion);
 	renderer.render(scene, camera);
@@ -669,13 +684,32 @@ window.toggleEngine = function () {
 	orbit.enabled = !engineOn;
 }
 
+var updateGearButton = function () {
+	document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
+	document.getElementById("img-gear-reverse").style.display = gearPosition == 'R' ? 'block' : 'none'
+}
+updateGearButton();
+
+window.toggleGearPos = function () {
+	if (gearPosition == 'D')
+		gearPosition = 'R'
+	else
+		gearPosition = 'D'
+
+	updateGearButton();
+}
+
 
 window.pressGas = function () {
-	isAccelerating = true;
+	if (gearPosition == 'D')
+		isAccelerating = true;
+	else
+		isBraking = true;
 }
 
 window.releaseGas = function () {
 	isAccelerating = false;
+	isBraking = false;
 }
 
 window.pressLeft = function () {
