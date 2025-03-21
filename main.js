@@ -140,7 +140,7 @@ groundLoader.load(
 
 // Create an empty object (a parent container)
 var parkingSpot = new THREE.Object3D();
-parkingSpot.position.set(40, 0, 40);
+parkingSpot.position.set(35, 0, 35);
 scene.add(parkingSpot);  // Add the empty object to the scene
 
 const parkingLoader = new FBXLoader()
@@ -219,10 +219,10 @@ world.addBody(groundBody);
 var wallBodies = [];
 var wallMeshes = [];
 const wallData = [
-	{ w: 1, h: 100, d: 10, posX: 45, posY: 5, posZ: 0 },
-	{ w: 1, h: 100, d: 10, posX: -45, posY: 5, posZ: 0 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: 48 },
-	{ w: 100, h: 1, d: 10, posX: 0, posY: 5, posZ: -48 },
+	{ w: 1, h: 100, d: 10, posX: 45, posY: 3, posZ: 0 },
+	{ w: 1, h: 100, d: 10, posX: -45, posY: 3, posZ: 0 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 3, posZ: 48 },
+	{ w: 100, h: 1, d: 10, posX: 0, posY: 3, posZ: -48 },
 ]
 
 for (let i = 0; i < wallData.length; i++) {
@@ -239,6 +239,13 @@ for (let i = 0; i < wallData.length; i++) {
 	// Add to the world
 	world.addBody(wall);
 	wallBodies.push(wall);
+
+	//handle collision
+	wall.addEventListener("collide", function (e) {
+		if (e.body == rod) {
+			showGameOver();
+		}
+	});
 
 	// Create and add the mesh for visual representation
 	const wallMesh = new THREE.Mesh(
@@ -260,6 +267,98 @@ function updateWallMeshesPos() {
 	}
 }
 
+// Obstacles
+var obstacleBodies = [];
+var obstacleMeshes = [];
+var obstacleObj3D = [];
+let obstacleW = 3;
+let obstacleH = 5;
+let obstacleD = 10;
+const obstacleData = [
+	{ posX: -15, posY: 3, posZ: -40 },
+	{ posX: -15, posY: 3, posZ: -30 },
+	{ posX: -15, posY: 3, posZ: -20 },
+	{ posX: -15, posY: 3, posZ: -10 },
+	{ posX: -11.5, posY: 3, posZ: 0, rot: Math.PI / 2 },
+	{ posX: -8, posY: 3, posZ: 10 },
+	{ posX: -8, posY: 3, posZ: 20 },
+
+	{ posX: 10, posY: 3, posZ: 0 },
+	{ posX: 10, posY: 3, posZ: -10 },
+	{ posX: 13.5, posY: 3, posZ: -20, rot: Math.PI / 2 },
+];
+
+for (let i = 0; i < obstacleData.length; i++) {
+	let obstacle = new CANNON.Body({
+		mass: 50,
+		material: new CANNON.Material(),
+		shape: new CANNON.Box(new CANNON.Vec3(obstacleW / 2, obstacleH / 2, obstacleD / 2)),
+		position: new CANNON.Vec3(obstacleData[i].posX, obstacleData[i].posY, obstacleData[i].posZ)
+	});
+
+	// Apply rotation to the physics body
+	obstacle.quaternion.setFromEuler(0, obstacleData[i].rot ? obstacleData[i].rot : 0, 0);
+	world.addBody(obstacle);
+	obstacleBodies.push(obstacle);
+
+	// Handle collision
+	obstacle.addEventListener("collide", function (e) {
+		if (e.body == rod) {
+			showGameOver();
+		}
+	});
+
+	// Create and add the mesh for visual representation
+	const obstacleMesh = new THREE.Mesh(
+		new THREE.BoxGeometry(obstacleW, obstacleH, obstacleD),
+		new THREE.MeshBasicMaterial({ color: 0x0000ff })
+	);
+
+	if (SHOW_HELPER) scene.add(obstacleMesh);
+	obstacleMeshes.push(obstacleMesh);
+
+	// Set the position and rotation for visual representation
+	obstacleMesh.position.copy(obstacle.position);
+	obstacleMesh.quaternion.copy(obstacle.quaternion);
+
+	// Load the FBX model
+	let obstacleObjLoader = new FBXLoader();
+	obstacleObjLoader.load(
+		'assets/Obstacle01.fbx',
+		(object) => {
+			let scaleObj = 0.02;
+			object.scale.set(scaleObj, scaleObj, scaleObj);
+
+			// Create an empty container (Object3D) to act as a pivot
+			var pivot = new THREE.Object3D();
+			pivot.position.set(0, -3, 0);
+			pivot.add(object);
+
+			// Add the loaded FBX model to the obstacleObj
+			scene.add(pivot);
+			obstacleObj3D.push(object);
+		},
+		(xhr) => {
+			console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+		},
+		(error) => {
+			console.log(error);
+		}
+	);
+}
+
+
+
+function updateObstaclesPos() {
+	for (let i = 0; i < obstacleObj3D.length; i++) {
+		// Sync position and rotation
+		obstacleMeshes[i].position.copy(obstacleBodies[i].position);
+		obstacleMeshes[i].quaternion.copy(obstacleBodies[i].quaternion);
+
+		obstacleObj3D[i].position.copy(obstacleBodies[i].position);
+		obstacleObj3D[i].quaternion.copy(obstacleBodies[i].quaternion);
+	}
+}
 
 // Create materials for wheels and rods
 const rodWidth = 2.5;
@@ -276,9 +375,8 @@ const offsetZWheel = 2;
 const posStart = { x: 0, y: 1.5, z: -30 };
 
 //set camera based on starting pos
-camera.position.set(posStart.x + 10, 5, posStart.z + 10);
-camera.lookAt(new THREE.Vector3(posStart.x, 0, posStart.z));
-orbit.target.set(posStart.x, 0, posStart.z)
+camera.position.set(posStart.x + 8, 5, posStart.z + 8);
+orbit.target.set(posStart.x, posStart.y + 2, posStart.z)
 orbit.update();
 
 // Number of wheels and positions
@@ -415,11 +513,13 @@ function updateMeshesFromBodies() {
 	}
 }
 
+var isGameOver = false;
 var engineOn = false;
 var gearPosition = 'D'
 var showTutorial = true;
 
 // Get the screen element
+const controlScreen = document.getElementById('controlScreen');
 const tutorialScreen = document.getElementById('tutorialScreen');
 const endScreen = document.getElementById('endScreen');
 const loadingScreen = document.getElementById('loadingScreen');
@@ -632,14 +732,43 @@ function animate() {
 
 	updateWallMeshesPos();
 
+	updateObstaclesPos();
+
 	if (parkingSpot) {
 		// console.log(car3D.position.distanceTo(parkingSpot.position));
-		if (car3D.position.distanceTo(parkingSpot.position) < 2) {
-			// console.log("TRIGGER");
-			endScreen.style.display = 'block'; // show end game
+		if (car3D.position.distanceTo(parkingSpot.position) < 1.5) {
+			// Step 1: Convert the Euler rotations to quaternions
+			const quaternion1 = new THREE.Quaternion().setFromEuler(car3D.rotation); // Convert object1's Euler rotation to quaternion
+			const quaternion2 = new THREE.Quaternion().setFromEuler(parkingSpot.rotation); // Convert object2's Euler rotation to quaternion
 
-			engineOn = false;
-			updateEngineButton();
+			// Step 2: Calculate the angle between the two quaternions using the angleTo() method
+			const angle = quaternion1.angleTo(quaternion2); // This gives the angle in radians
+
+			// If you need the angle in degrees:
+			const angleInDegrees = THREE.MathUtils.radToDeg(angle);
+
+			// console.log(`Rotation difference in radians: ${angle}`);
+			// console.log(`Rotation difference in degrees: ${angleInDegrees}`);
+
+			if (angleInDegrees < 2)
+				showGameOver();
+		}
+	}
+
+	if (isGameOver) {
+		// console.log(Math.abs(getCarSpeed().speed))
+		if (Math.abs(getCarSpeed().speed) > 0.5) {
+			for (let i = 0; i < wheels.length; i++) {
+
+				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
+				const localTorque = new CANNON.Vec3(0, 1000, 0);  // Apply along the local x-axis
+
+				// Convert the local torque to world space using the body's quaternion
+				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
+
+				// Apply the world space torque to the body
+				wheels[i].applyTorque(worldTorque);
+			}
 		}
 	}
 
@@ -650,8 +779,19 @@ function animate() {
 
 animate();
 
+function showGameOver() {
+	controlScreen.style.display = 'none'; // hide control canvas
 
-var updateEngineButton = function () {
+	endScreen.style.display = 'flex'; // show end game
+
+	engineOn = false;
+	updateEngineButton();
+
+	isGameOver = true;
+}
+
+
+function updateEngineButton() {
 	document.getElementById("img-engine-off").style.display = engineOn ? 'none' : 'block'
 	document.getElementById("img-engine-on").style.display = engineOn ? 'block' : 'none'
 }
