@@ -21,18 +21,21 @@
 
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
 	<!-- <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r92/examples/js/loaders/GLTFLoader.js"></script> -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script> -->
 	<script src="https://cdn.tailwindcss.com"></script>
-	<!-- <canvas id="gameCanvas" width="300" height="500"></canvas> -->
 
-  <script type="module" crossorigin src="/playable-ads/assets/index-RmWfI-O6.js"></script>
+  <script type="module" crossorigin src="/assets/index-B5xiGBAZ.js"></script>
 </head>
 
 <body>
-	<canvas id="gameCanvas"></canvas>
+	<audio id="engineOnSound" src="/assets/Engine_start-CthBRv_K.ogg"></audio>
+	<audio id="engineLoopSound" src="/assets/engine-CcUFndOJ.wav" loop></audio>
+	<audio id="engineOffSound" src="/assets/Engine_stop-DF3iY3rM.ogg"></audio>
+
+	<!-- <canvas id="gameCanvas"></canvas> -->
 	<div id="tutorialScreen" class="absolute left-[5%] top-[55%]">
 		<div class="animate-bounce">
-			<img src="/playable-ads/assets/hand-Ca-oVv88.png">
+			<img src="/assets/hand-Ca-oVv88.png">
 		</div>
 		<!-- <div class=" uppercase bold underline text-xl">
 			Press here to start engine
@@ -42,32 +45,39 @@
 	<div id="controlScreen" class="absolute w-full h-full m-auto pointer-events-none ">
 		<div class="relative w-full h-full">
 			<button onclick="toggleEngine()" class="pointer-events-auto absolute left-[5%] top-[50%] transform -translateY-1/2 transition transform active:scale-90">
-				<img id="img-engine-off" src="/playable-ads/assets/engineOff-CYjBlAzL.png" draggable="false">
-				<img id="img-engine-on" class="hidden" src="/playable-ads/assets/engineOn-BQMudlsU.png" draggable="false">
+				<img id="img-engine-off" src="/assets/engineOff-CYjBlAzL.png" draggable="false">
+				<img id="img-engine-on" class="hidden" src="/assets/engineOn-BQMudlsU.png" draggable="false">
+			</button>
+			<button onclick="toggleGearPos()" class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
+				<img id="img-gear-drive" src="/assets/GearDrive-DqKp9nHT.png" draggable="false">
+				<img id="img-gear-reverse" src="/assets/GearReverse-02FOFT-i.png" draggable="false">
 			</button>
 			<div class="absolute left-[5%] bottom-[20px] transform -translateY-1/2 flex gap-5">
 				<button onmousedown="pressLeft()" onmouseup="releaseArrow()" class="pointer-events-auto transition transform active:scale-90">
-					<img src="/playable-ads/assets/arrowLeft-CBP_Wf_A.png" draggable="false">
+					<img src="/assets/arrowLeft-CBP_Wf_A.png" draggable="false">
 				</button>
 				<button onmousedown="pressRight()" onmouseup="releaseArrow()" class="pointer-events-auto transition transform active:scale-90">
-					<img src="/playable-ads/assets/arrowRight-Cs7tjixU.png" draggable="false">
+					<img src="/assets/arrowRight-Cs7tjixU.png" draggable="false">
 				</button>
 			</div>
 			<button onmousedown="pressGas()" onmouseup="releaseGas()" class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
-				<img src="/playable-ads/assets/GasPedal-By7Bp8S-.png" draggable="false">
+				<img src="/assets/GasPedal-By7Bp8S-.png" draggable="false">
 			</button>
 		</div>
 	</div>
 
 	<div id="endScreen"
-		class="hidden absolute inset-0 m-auto h-fit w-fit px-10 py-20 bg-white rounded-xl uppercase bold text-xl">
+		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-10 bg-white rounded-xl uppercase bold text-xl flex flex-col items-center justify-center gap-5">
 		<div class="">
 			Game Over
 		</div>
+		<button class="border border-black px-5 py-2 leading-none" onclick="location.reload();">
+			retry
+		</button>
 	</div>
 
 	<div id="loadingScreen" class="absolute w-full h-full m-auto bg-[#000000] bg-opacity-75 flex flex-col gap-1 items-center justify-center">
-		<img class="w-[50px]" src="/playable-ads/assets/loading-leBgH9Vw.gif">
+		<img class="w-[50px]" src="/assets/loading-leBgH9Vw.gif">
 		<div class="text-white">
 			Loading..
 		</div>
