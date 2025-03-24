@@ -10,10 +10,6 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"serve": "vue-cli-service serve",
-		"build": "vue-cli-service build",
-		"lint": "vue-cli-service lint",
-		"predeploy": "npm run build", // Build the app before deploying
-		"deploy": "gh-pages -d dist" // Deploy the contents of the 'dist' folder to the gh-pages branch
+		"build": "vite build"
 	}
 }
