@@ -60,20 +60,47 @@
 					<img src="/assets/arrowRight.png" draggable="false">
 				</button>
 			</div>
-			<button onmousedown="pressGas()" onmouseup="releaseGas()" class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
-				<img src="/assets/GasPedal.png" draggable="false">
+			<button id="btnAccelerate"  class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
+				<img src="/assets/GasPedal.png" >
 			</button>
+			<!-- <button
+			ontouchstart="startPress()" ontouchend="endPress()"
+			class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
+				<img src="/assets/GasPedal.png" draggable="false">
+			</button> -->
 		</div>
 	</div>
 
 	<div id="endScreen"
-		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-10 bg-white rounded-xl uppercase bold text-xl flex flex-col items-center justify-center gap-5">
-		<div class="">
+		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-6 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
+		<div class="uppercase text-2xl font-bold text-[#DB6C00] drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
 			Game Over
 		</div>
-		<button class="border border-black px-5 py-2 leading-none" onclick="location.reload();">
-			retry
+		<div class="text-lg">
+			You failed the mission
+		</div>
+		<button class="bg-[#DB6C00] rounded-lg px-5 py-2 leading-none" onclick="location.reload();">
+			Retry
 		</button>
+	</div>
+
+	<div id="completeScreen"
+		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-6 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
+		<div class="uppercase text-2xl font-bold text-[#DB6C00] drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+			Level Completed
+		</div>
+		<div class="text-lg">
+			You have completed the mission
+		</div>
+		<div class="flex gap-5">
+			<button class="bg-transparent border border-white rounded-lg px-5 py-2 leading-none" onclick="location.reload();">
+				Retry
+			</button>
+			<button class="bg-[#DB6C00] rounded-lg px-5 py-2 leading-none" onclick="location.reload();">
+				Next
+			</button>
+		</div>
+		
 	</div>
 
 	<div id="loadingScreen" class="absolute w-full h-full m-auto bg-[#000000] bg-opacity-75 flex flex-col gap-1 items-center justify-center">

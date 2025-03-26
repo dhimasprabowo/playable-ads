@@ -372,7 +372,7 @@ const offsetXWheel = rodWidth / 2;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
 
-const posStart = { x: 0, y: 1.5, z: -30 };
+const posStart = { x: 0, y: 2, z: -30 };
 
 //set camera based on starting pos
 camera.position.set(posStart.x + 8, 5, posStart.z + 8);
@@ -405,7 +405,7 @@ const wheels = [];
 for (let i = 0; i < wheelPositions.length; i++) {
 	// Cannon.js wheel creation
 	const wheel = new CANNON.Body({
-		mass: 20,
+		mass: 100,
 		material: wheelMaterial,
 		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 32),
 	});
@@ -463,7 +463,7 @@ for (let i = 0; i < wheelLocalPositions.length; i++) {
 
 // Connecting rod (Cannon.js & Three.js)
 const rod = new CANNON.Body({
-	mass: 200,
+	mass: 500,
 	material: rodMaterial,
 	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
 });
@@ -522,6 +522,7 @@ var showTutorial = true;
 const controlScreen = document.getElementById('controlScreen');
 const tutorialScreen = document.getElementById('tutorialScreen');
 const endScreen = document.getElementById('endScreen');
+const completeScreen = document.getElementById('completeScreen');
 const loadingScreen = document.getElementById('loadingScreen');
 
 // Additional setup for controlling car's back wheels
@@ -571,8 +572,8 @@ window.addEventListener('keyup', (event) => {
 
 // Function to apply torque to the back wheels
 function applyTorqueToBackWheels() {
-	const torqueStrength = 300; // Adjust this value to increase or decrease the torque
-	const brakeStrengthDefault = 800; // Adjust this value to control braking force
+	const torqueStrength = 800; // Adjust this value to increase or decrease the torque
+	const brakeStrengthDefault = 2000; // Adjust this value to control braking force
 
 	// Apply torque to the back wheels (wheel 3 and wheel 4)
 	if (isAccelerating) {
@@ -751,7 +752,7 @@ function animate() {
 			// console.log(`Rotation difference in degrees: ${angleInDegrees}`);
 
 			if (angleInDegrees < 2)
-				showGameOver();
+				showGameOver(true);
 		}
 	}
 
@@ -779,10 +780,13 @@ function animate() {
 
 animate();
 
-function showGameOver() {
+function showGameOver(success = false) {
 	controlScreen.style.display = 'none'; // hide control canvas
 
-	endScreen.style.display = 'flex'; // show end game
+	if (success)
+		completeScreen.style.display = 'flex';
+	else
+		endScreen.style.display = 'flex';
 
 	engineOn = false;
 	updateEngineButton();
@@ -867,3 +871,40 @@ document.addEventListener('mouseup', function (event) {
 	releaseGas();
 	releaseArrow();
 });
+
+// Get the button element (btnAccelerate)
+const btnAccelerate = document.getElementById('btnAccelerate');
+
+// Function to handle the start of the touch or mouse event
+function startPress(event) {
+	//event.preventDefault(); // Prevent default touch behavior (like scrolling)
+	pressGas();
+
+	console.log('Button is being held!');
+}
+
+// Function to handle the end of the touch or mouse event
+function endPress() {
+	releaseGas();
+
+	// Clear the timer if the user releases before the time is up
+	console.log('Button was released');
+}
+
+// Adding event listeners for both touch and mouse events
+btnAccelerate.addEventListener('touchstart', startPress);
+btnAccelerate.addEventListener('mousedown', startPress); // For desktop or mouse users
+
+btnAccelerate.addEventListener('touchend', endPress);
+btnAccelerate.addEventListener('mouseup', endPress); // For desktop or mouse users
+
+// Handle touch cancel event (e.g., user swipes away)
+btnAccelerate.addEventListener('touchcancel', () => {
+	endPress();
+});
+
+// Prevent the context menu from appearing on right-click or long press
+btnAccelerate.addEventListener('contextmenu', function(event) {
+	event.preventDefault(); // Prevent the context menu
+});
+
