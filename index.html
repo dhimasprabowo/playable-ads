@@ -19,6 +19,7 @@
 		}
 
 		@keyframes scaleUpDown {
+
 			0%,
 			100% {
 				transform: scale(1);
@@ -66,6 +67,12 @@
 
 	<div id="controlScreen" class="absolute w-full h-full m-auto pointer-events-none ">
 		<div class="relative w-full h-full">
+			<div id="completionDisplay"
+				class="hidden absolute top-[20px] left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+				<span>Completed: </span>
+				<span class="font-bold text-3xl">0%</span>
+			</div>
+
 			<button onclick="toggleEngine()"
 				class="pointer-events-auto absolute left-[5%] top-[50%] transform -translateY-1/2 transition transform active:scale-90">
 				<img id="img-engine-off" src="/assets/engineOff.png" draggable="false">
@@ -124,9 +131,10 @@
 				onclick="location.reload();">
 				Retry
 			</button>
-			<button class="animate-scale-up-down bg-[#DB6C00] rounded-lg px-5 py-2 leading-none font-bold" onclick="location.reload();">
+			<a href="https://play.google.com/store/apps/details?id=com.maleo.cardrivingonline"
+				class="animate-scale-up-down bg-[#DB6C00] rounded-lg px-5 py-2 leading-none font-bold">
 				Play More Level
-			</button>
+			</a>
 
 		</div>
 
