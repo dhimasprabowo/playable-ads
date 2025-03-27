@@ -331,7 +331,7 @@ for (let i = 0; i < obstacleData.length; i++) {
 
 			// Create an empty container (Object3D) to act as a pivot
 			var pivot = new THREE.Object3D();
-			pivot.position.set(0, -3, 0);
+			pivot.position.set(0, -2.5, 0);
 			pivot.add(object);
 
 			// Add the loaded FBX model to the obstacleObj
@@ -420,8 +420,8 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 	groundBodyMaterial,     // Ground material
 	wheelMaterial,      // Wheel material
 	{
-		friction: 0.95,   // Friction between ground and wheels (adjustable)
-		restitution: 0  // Bounciness (not necessary for friction but can be adjusted)
+		friction: 0.8,   // Friction between ground and wheels (adjustable)
+		restitution: 0.01  // Bounciness (not necessary for friction but can be adjusted)
 	}
 );
 
@@ -520,10 +520,13 @@ var showTutorial = true;
 
 // Get the screen element
 const controlScreen = document.getElementById('controlScreen');
-const tutorialScreen = document.getElementById('tutorialScreen');
+const tutorialStep1 = document.getElementById('tutorialStep1');
+const tutorialStep2 = document.getElementById('tutorialStep2');
 const endScreen = document.getElementById('endScreen');
 const completeScreen = document.getElementById('completeScreen');
 const loadingScreen = document.getElementById('loadingScreen');
+const completionDisplay = document.getElementById('completionDisplay');
+var completion = completionDisplay.children[1];
 
 // Additional setup for controlling car's back wheels
 let isAccelerating = false;
@@ -539,6 +542,7 @@ window.addEventListener('keydown', (event) => {
 		//update UI
 		gearPosition = 'D';
 		updateGearButton();
+		tutorialStep2.style.display = 'none'; // Hide tutorial screen
 	}
 	if (event.key === 'ArrowDown' || event.key === 's') {
 		isBraking = true;
@@ -736,8 +740,13 @@ function animate() {
 	updateObstaclesPos();
 
 	if (parkingSpot) {
+		var angleInDegrees = 0;
+		var angleTolerance = 2;
+		var distanceTolerance = 1.5;
+
 		// console.log(car3D.position.distanceTo(parkingSpot.position));
-		if (car3D.position.distanceTo(parkingSpot.position) < 1.5) {
+		if (car3D.position.distanceTo(parkingSpot.position) < 5) {
+
 			// Step 1: Convert the Euler rotations to quaternions
 			const quaternion1 = new THREE.Quaternion().setFromEuler(car3D.rotation); // Convert object1's Euler rotation to quaternion
 			const quaternion2 = new THREE.Quaternion().setFromEuler(parkingSpot.rotation); // Convert object2's Euler rotation to quaternion
@@ -746,30 +755,17 @@ function animate() {
 			const angle = quaternion1.angleTo(quaternion2); // This gives the angle in radians
 
 			// If you need the angle in degrees:
-			const angleInDegrees = THREE.MathUtils.radToDeg(angle);
+			angleInDegrees = THREE.MathUtils.radToDeg(angle);
 
 			// console.log(`Rotation difference in radians: ${angle}`);
 			// console.log(`Rotation difference in degrees: ${angleInDegrees}`);
 
-			if (angleInDegrees < 2)
+			if (angleInDegrees < angleTolerance && car3D.position.distanceTo(parkingSpot.position) < distanceTolerance) {
 				showGameOver(true);
-		}
-	}
-
-	if (isGameOver) {
-		// console.log(Math.abs(getCarSpeed().speed))
-		if (Math.abs(getCarSpeed().speed) > 0.5) {
-			for (let i = 0; i < wheels.length; i++) {
-
-				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
-				const localTorque = new CANNON.Vec3(0, 1000, 0);  // Apply along the local x-axis
-
-				// Convert the local torque to world space using the body's quaternion
-				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
-
-				// Apply the world space torque to the body
-				wheels[i].applyTorque(worldTorque);
 			}
+
+			completionDisplay.style.display = 'flex'
+			completion.textContent = Math.floor(100 - Math.abs(angleInDegrees - angleTolerance)) + '%'
 		}
 	}
 
@@ -809,7 +805,8 @@ window.toggleEngine = function () {
 
 	//hide tutorial
 	showTutorial = false;
-	tutorialScreen.style.display = 'none'; // Hide tutorial screen
+	tutorialStep1.style.display = 'none'; // Hide tutorial screen
+	tutorialStep2.style.display = 'block'; // Hide tutorial screen
 
 	if (engineOn) {
 		document.getElementById('engineOnSound').play();
@@ -849,6 +846,8 @@ window.pressGas = function () {
 		isAccelerating = true;
 	else
 		isBraking = true;
+
+	tutorialStep2.style.display = 'none'; // Hide tutorial screen
 }
 
 window.releaseGas = function () {
@@ -904,7 +903,7 @@ btnAccelerate.addEventListener('touchcancel', () => {
 });
 
 // Prevent the context menu from appearing on right-click or long press
-btnAccelerate.addEventListener('contextmenu', function(event) {
+btnAccelerate.addEventListener('contextmenu', function (event) {
 	event.preventDefault(); // Prevent the context menu
 });
 

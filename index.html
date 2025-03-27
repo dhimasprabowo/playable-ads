@@ -17,6 +17,37 @@
 			height: 100%;
 			background-color: #fff;
 		}
+
+		@keyframes scaleUpDown {
+
+			0%,
+			100% {
+				transform: scale(1);
+			}
+
+			50% {
+				transform: scale(1.1);
+			}
+		}
+
+		.animate-scale-up-down {
+			animation: scaleUpDown 1s ease-in-out infinite;
+		}
+
+		@keyframes pressInstruction {
+			0% {
+				transform: scale(1.25);
+			}
+
+			40%,
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		.animate-pressing {
+			animation: pressInstruction 2s ease-in-out infinite;
+		}
 	</style>
 
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
@@ -24,56 +55,58 @@
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script> -->
 	<script src="https://cdn.tailwindcss.com"></script>
 
-
-  <script type="module" crossorigin src="assets/index-Bxm3IgFM.js"></script>
+	<script type="module" src="/main.js"></script>
 </head>
 
 <body>
-	<audio id="engineOnSound" src="assets/Engine_start-CthBRv_K.ogg"></audio>
-	<audio id="engineLoopSound" src="assets/engine-CcUFndOJ.wav" loop></audio>
-	<audio id="engineOffSound" src="assets/Engine_stop-DF3iY3rM.ogg"></audio>
+	<audio id="engineOnSound" src="/assets/Engine_start.ogg"></audio>
+	<audio id="engineLoopSound" src="/assets/engine.wav" loop></audio>
+	<audio id="engineOffSound" src="/assets/Engine_stop.ogg"></audio>
 
 	<!-- <canvas id="gameCanvas"></canvas> -->
-	<div id="tutorialScreen" class="absolute left-[5%] top-[55%]">
-		<div class="animate-bounce">
-			<img src="assets/hand-Ca-oVv88.png">
-		</div>
-		<!-- <div class=" uppercase bold underline text-xl">
-			Press here to start engine
-		</div> -->
-	</div>
 
 	<div id="controlScreen" class="absolute w-full h-full m-auto pointer-events-none ">
 		<div class="relative w-full h-full">
-			<button onclick="toggleEngine()" class="pointer-events-auto absolute left-[5%] top-[50%] transform -translateY-1/2 transition transform active:scale-90">
-				<img id="img-engine-off" src="assets/engineOff-CYjBlAzL.png" draggable="false">
-				<img id="img-engine-on" class="hidden" src="assets/engineOn-BQMudlsU.png" draggable="false">
+			<div id="completionDisplay"
+				class="hidden absolute top-[20px] left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+				<span>Completed: </span>
+				<span class="font-bold text-3xl">0%</span>
+			</div>
+
+			<button onclick="toggleEngine()"
+				class="pointer-events-auto absolute left-[5%] top-[50%] transform -translateY-1/2 transition transform active:scale-90">
+				<img id="img-engine-off" src="/assets/engineOff.png" draggable="false">
+				<img id="img-engine-on" class="hidden" src="/assets/engineOn.png" draggable="false">
 			</button>
-			<button onclick="toggleGearPos()" class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
-				<img id="img-gear-drive" src="assets/GearDrive-DqKp9nHT.png" draggable="false">
-				<img id="img-gear-reverse" src="assets/GearReverse-02FOFT-i.png" draggable="false">
+			<button onclick="toggleGearPos()"
+				class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
+				<img id="img-gear-drive" src="/assets/GearDrive.png" draggable="false">
+				<img id="img-gear-reverse" src="/assets/GearReverse.png" draggable="false">
 			</button>
 			<div class="absolute left-[5%] bottom-[20px] transform -translateY-1/2 flex gap-5">
-				<button onmousedown="pressLeft()" onmouseup="releaseArrow()" class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/arrowLeft-CBP_Wf_A.png" draggable="false">
+				<button onmousedown="pressLeft()" onmouseup="releaseArrow()"
+					class="pointer-events-auto transition transform active:scale-90">
+					<img src="/assets/arrowLeft.png" draggable="false">
 				</button>
-				<button onmousedown="pressRight()" onmouseup="releaseArrow()" class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/arrowRight-Cs7tjixU.png" draggable="false">
+				<button onmousedown="pressRight()" onmouseup="releaseArrow()"
+					class="pointer-events-auto transition transform active:scale-90">
+					<img src="/assets/arrowRight.png" draggable="false">
 				</button>
 			</div>
-			<button id="btnAccelerate"  class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
-				<img src="assets/GasPedal-By7Bp8S-.png" >
+			<button id="btnAccelerate"
+				class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
+				<img src="/assets/GasPedal.png">
 			</button>
 			<!-- <button
 			ontouchstart="startPress()" ontouchend="endPress()"
 			class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
-				<img src="assets/GasPedal.png" draggable="false">
+				<img src="/assets/GasPedal.png" draggable="false">
 			</button> -->
 		</div>
 	</div>
 
 	<div id="endScreen"
-		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-6 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
+		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-8 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
 		<div class="uppercase text-2xl font-bold text-[#DB6C00] drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
 			Game Over
 		</div>
@@ -86,26 +119,41 @@
 	</div>
 
 	<div id="completeScreen"
-		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-6 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
+		class="hidden absolute inset-0 m-auto h-fit w-fit px-12 py-8 text-white bg-[#2C2E34] rounded-xl border border-[#DB6C00] bold text-xl flex flex-col items-center justify-center gap-5">
 		<div class="uppercase text-2xl font-bold text-[#DB6C00] drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
 			Level Completed
 		</div>
 		<div class="text-lg">
 			You have completed the mission
 		</div>
-		<div class="flex gap-5">
-			<button class="bg-transparent border border-white rounded-lg px-5 py-2 leading-none" onclick="location.reload();">
+		<div class="flex flex-col gap-3">
+			<button class="bg-transparent border border-white rounded-lg px-5 py-2 leading-none"
+				onclick="location.reload();">
 				Retry
 			</button>
-			<button class="bg-[#DB6C00] rounded-lg px-5 py-2 leading-none" onclick="location.reload();">
-				Next
-			</button>
+			<a href="https://play.google.com/store/apps/details?id=com.maleo.cardrivingonline"
+				class="animate-scale-up-down bg-[#DB6C00] rounded-lg px-5 py-2 leading-none font-bold">
+				Play More Level
+			</a>
+
 		</div>
-		
+
 	</div>
 
-	<div id="loadingScreen" class="absolute w-full h-full m-auto bg-[#000000] bg-opacity-75 flex flex-col gap-1 items-center justify-center">
-		<img class="w-[50px]" src="assets/loading-leBgH9Vw.gif">
+	<div id="tutorialStep1" class="absolute left-[5%] top-[55%] pointer-events-none">
+		<div class="animate-bounce">
+			<img src="/assets/hand.png">
+		</div>
+	</div>
+	<div id="tutorialStep2" class="hidden absolute right-[5%] bottom-[20px] pointer-events-none">
+		<div class="animate-pressing">
+			<img src="/assets/hand.png">
+		</div>
+	</div>
+
+	<div id="loadingScreen"
+		class="absolute w-full h-full m-auto bg-[#000000] bg-opacity-75 flex flex-col gap-1 items-center justify-center">
+		<img class="w-[50px]" src="/assets/loading.gif">
 		<div class="text-white">
 			Loading..
 		</div>
