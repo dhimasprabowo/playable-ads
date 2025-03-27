@@ -331,7 +331,7 @@ for (let i = 0; i < obstacleData.length; i++) {
 
 			// Create an empty container (Object3D) to act as a pivot
 			var pivot = new THREE.Object3D();
-			pivot.position.set(0, -3, 0);
+			pivot.position.set(0, -2.5, 0);
 			pivot.add(object);
 
 			// Add the loaded FBX model to the obstacleObj
@@ -420,8 +420,8 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 	groundBodyMaterial,     // Ground material
 	wheelMaterial,      // Wheel material
 	{
-		friction: 0.95,   // Friction between ground and wheels (adjustable)
-		restitution: 0  // Bounciness (not necessary for friction but can be adjusted)
+		friction: 0.8,   // Friction between ground and wheels (adjustable)
+		restitution: 0.01  // Bounciness (not necessary for friction but can be adjusted)
 	}
 );
 
@@ -520,7 +520,8 @@ var showTutorial = true;
 
 // Get the screen element
 const controlScreen = document.getElementById('controlScreen');
-const tutorialScreen = document.getElementById('tutorialScreen');
+const tutorialStep1 = document.getElementById('tutorialStep1');
+const tutorialStep2 = document.getElementById('tutorialStep2');
 const endScreen = document.getElementById('endScreen');
 const completeScreen = document.getElementById('completeScreen');
 const loadingScreen = document.getElementById('loadingScreen');
@@ -539,6 +540,7 @@ window.addEventListener('keydown', (event) => {
 		//update UI
 		gearPosition = 'D';
 		updateGearButton();
+		tutorialStep2.style.display = 'none'; // Hide tutorial screen
 	}
 	if (event.key === 'ArrowDown' || event.key === 's') {
 		isBraking = true;
@@ -809,7 +811,8 @@ window.toggleEngine = function () {
 
 	//hide tutorial
 	showTutorial = false;
-	tutorialScreen.style.display = 'none'; // Hide tutorial screen
+	tutorialStep1.style.display = 'none'; // Hide tutorial screen
+	tutorialStep2.style.display = 'block'; // Hide tutorial screen
 
 	if (engineOn) {
 		document.getElementById('engineOnSound').play();
@@ -849,6 +852,8 @@ window.pressGas = function () {
 		isAccelerating = true;
 	else
 		isBraking = true;
+
+	tutorialStep2.style.display = 'none'; // Hide tutorial screen
 }
 
 window.releaseGas = function () {
