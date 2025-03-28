@@ -873,34 +873,32 @@ document.addEventListener('mouseup', function (event) {
 
 // Get the button element (btnAccelerate)
 const btnAccelerate = document.getElementById('btnAccelerate');
-
-// Function to handle the start of the touch or mouse event
-function startPress(event) {
-	//event.preventDefault(); // Prevent default touch behavior (like scrolling)
-	pressGas();
-
-	console.log('Button is being held!');
-}
-
-// Function to handle the end of the touch or mouse event
-function endPress() {
-	releaseGas();
-
-	// Clear the timer if the user releases before the time is up
-	console.log('Button was released');
-}
+const btnLeft = document.getElementById('btnLeft');
+const btnRight = document.getElementById('btnRight');
 
 // Adding event listeners for both touch and mouse events
-btnAccelerate.addEventListener('touchstart', startPress);
-btnAccelerate.addEventListener('mousedown', startPress); // For desktop or mouse users
+btnAccelerate.addEventListener('touchstart', pressGas);
+btnAccelerate.addEventListener('mousedown', pressGas); // For desktop or mouse users
 
-btnAccelerate.addEventListener('touchend', endPress);
-btnAccelerate.addEventListener('mouseup', endPress); // For desktop or mouse users
+btnAccelerate.addEventListener('touchend', releaseGas);
+btnAccelerate.addEventListener('mouseup', releaseGas); // For desktop or mouse users
+btnAccelerate.addEventListener('touchcancel', releaseGas); // Handle touch cancel event (e.g., user swipes away)
 
-// Handle touch cancel event (e.g., user swipes away)
-btnAccelerate.addEventListener('touchcancel', () => {
-	endPress();
-});
+
+btnLeft.addEventListener('touchstart', pressLeft);
+btnLeft.addEventListener('mousedown', pressLeft); // For desktop or mouse users
+
+btnLeft.addEventListener('touchend', releaseArrow);
+btnLeft.addEventListener('mouseup', releaseArrow); // For desktop or mouse users
+btnLeft.addEventListener('touchcancel', releaseArrow); // Handle touch cancel event (e.g., user swipes away)
+
+
+btnRight.addEventListener('touchstart', pressRight);
+btnRight.addEventListener('mousedown', pressRight); // For desktop or mouse users
+
+btnRight.addEventListener('touchend', releaseArrow);
+btnRight.addEventListener('mouseup', releaseArrow); // For desktop or mouse users
+btnRight.addEventListener('touchcancel', releaseArrow); // Handle touch cancel event (e.g., user swipes away)
 
 // Prevent the context menu from appearing on right-click or long press
 btnAccelerate.addEventListener('contextmenu', function (event) {
