@@ -897,13 +897,13 @@ btnRight.addEventListener('mouseup', releaseArrow); // For desktop or mouse user
 btnRight.addEventListener('touchcancel', releaseArrow); // Handle touch cancel event (e.g., user swipes away)
 
 // Prevent the context menu from appearing on right-click or long press
-btnAccelerate.addEventListener('contextmenu', function (event) {
+window.addEventListener('contextmenu', function (event) {
 	event.preventDefault(); // Prevent the context menu
 });
-btnLeft.addEventListener('contextmenu', function (event) {
+/* btnLeft.addEventListener('contextmenu', function (event) {
 	event.preventDefault(); // Prevent the context menu
 });
 btnRight.addEventListener('contextmenu', function (event) {
 	event.preventDefault(); // Prevent the context menu
-});
+}); */
 
