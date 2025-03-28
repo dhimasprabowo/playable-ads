@@ -904,4 +904,10 @@ btnRight.addEventListener('touchcancel', releaseArrow); // Handle touch cancel e
 btnAccelerate.addEventListener('contextmenu', function (event) {
 	event.preventDefault(); // Prevent the context menu
 });
+btnLeft.addEventListener('contextmenu', function (event) {
+	event.preventDefault(); // Prevent the context menu
+});
+btnRight.addEventListener('contextmenu', function (event) {
+	event.preventDefault(); // Prevent the context menu
+});
 
