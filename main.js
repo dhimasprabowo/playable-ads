@@ -866,10 +866,6 @@ window.releaseArrow = function () {
 	isTurningRight = false;
 }
 
-document.addEventListener('mouseup', function (event) {
-	releaseGas();
-	releaseArrow();
-});
 
 // Get the button element (btnAccelerate)
 const btnAccelerate = document.getElementById('btnAccelerate');
