@@ -75,25 +75,30 @@
 				<img id="img-engine-off" src="/assets/engineOff.png" draggable="false">
 				<img id="img-engine-on" class="hidden" src="/assets/engineOn.png" draggable="false">
 			</button>
-			<button onclick="toggleGearPos()"
+			<!-- <button onclick="toggleGearPos()"
 				class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
 				<img id="img-gear-drive" src="/assets/GearDrive.png" draggable="false">
 				<img id="img-gear-reverse" src="/assets/GearReverse.png" draggable="false">
-			</button>
-			<div class="absolute left-[5%] bottom-[20px] transform -translateY-1/2 flex gap-5">
-				<button id="btnLeft"
-					class="pointer-events-auto transition transform active:scale-90">
+			</button> -->
+			<div class="absolute left-[3%] bottom-[20px] flex gap-5">
+				<button id="btnLeft" class="pointer-events-auto transition transform active:scale-90">
 					<img src="/assets/arrowLeft.png" draggable="false">
 				</button>
-				<button id="btnRight"
-					class="pointer-events-auto transition transform active:scale-90">
+				<button id="btnRight" class="pointer-events-auto transition transform active:scale-90">
 					<img src="/assets/arrowRight.png" draggable="false">
 				</button>
 			</div>
-			<button id="btnAccelerate"
-				class="pointer-events-auto absolute right-[5%] bottom-[20px] transition transform active:scale-90">
-				<img src="/assets/GasPedal.png" draggable="false">
-			</button>
+			<div class="absolute right-[3%] bottom-[20px] flex items-end gap-5">
+				<button id="btnBrake"
+					class="pointer-events-auto transition transform active:scale-90">
+					<img src="/assets/BrakePedal.png" draggable="false">
+				</button>
+				<button id="btnAccelerate"
+					class="pointer-events-auto transition transform active:scale-90">
+					<img src="/assets/GasPedal.png" draggable="false">
+				</button>
+			</div>
+
 		</div>
 	</div>
 
@@ -135,7 +140,7 @@
 			<img src="/assets/hand.png">
 		</div>
 	</div>
-	<div id="tutorialStep2" class="hidden absolute right-[5%] bottom-[20px] pointer-events-none">
+	<div id="tutorialStep2" class="hidden absolute right-[3%] bottom-[20px] pointer-events-none">
 		<div class="animate-pressing">
 			<img src="/assets/hand.png">
 		</div>

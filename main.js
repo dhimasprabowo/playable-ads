@@ -364,10 +364,10 @@ function updateObstaclesPos() {
 const rodWidth = 2.5;
 const rodHeight = 1;
 const rodSize = 6;
-const wheelMaterial = new CANNON.Material('wheel');
 const rodMaterial = new CANNON.Material();
+const wheelMaterial = new CANNON.Material('wheel');
 const wheelThickness = 0.3;
-const wheelRadius = 0.6;
+const wheelRadius = 1;
 const offsetXWheel = rodWidth / 2;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
@@ -407,7 +407,7 @@ for (let i = 0; i < wheelPositions.length; i++) {
 	const wheel = new CANNON.Body({
 		mass: 100,
 		material: wheelMaterial,
-		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 32),
+		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 128),
 	});
 	wheel.quaternion.setFromEuler(0, 0, Math.PI / 2); // Align wheels along the x-axis
 	wheel.position.set(wheelPositions[i].x, wheelPositions[i].y, wheelPositions[i].z);
@@ -468,7 +468,7 @@ const rod = new CANNON.Body({
 	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
 });
 rod.position.set(posStart.x, posStart.y, posStart.z);
-rod.linearDamping = 0.5;
+rod.linearDamping = 0.35;
 
 world.addBody(rod);
 
@@ -576,7 +576,7 @@ window.addEventListener('keyup', (event) => {
 
 // Function to apply torque to the back wheels
 function applyTorqueToBackWheels() {
-	const torqueStrength = 800; // Adjust this value to increase or decrease the torque
+	const torqueStrength = 1200; // Adjust this value to increase or decrease the torque
 	const brakeStrengthDefault = 2000; // Adjust this value to control braking force
 
 	// Apply torque to the back wheels (wheel 3 and wheel 4)
@@ -621,9 +621,10 @@ function applyTorqueToBackWheels() {
 }
 
 // Function to apply steering to the front wheels (rotate front wheels mesh only)
-function applySteering() {
-	const steeringAngleSpeed = 0.135; // Adjust this value to control the speed of steering
+const steeringMax = 0.135;
+var steeringAngleSpeed = 0; // Adjust this value to control the speed of steering
 
+function applySteering() {
 	// Apply angular velocity to the front wheels (index 0 and 1)
 	for (let i = 0; i < 2; i++) { // Only apply to front wheels
 		if (wheels[i]) {
@@ -633,23 +634,19 @@ function applySteering() {
 			let currentRotation = wheel.quaternion.clone();
 
 			if (isTurningLeft) {
-				// Create the local rotation (rotate around the Y-axis)
-				const localRotation = new CANNON.Quaternion();
-				localRotation.setFromEuler(0, steeringAngleSpeed, 0);
-
-				// Apply the local rotation to the wheel
-				wheel.quaternion = localRotation.mult(currentRotation)
+				steeringAngleSpeed = steeringMax;
 			} else if (isTurningRight) {
-				// Create the local rotation (rotate around the Y-axis)
-				const localRotation = new CANNON.Quaternion();
-				localRotation.setFromEuler(0, -steeringAngleSpeed, 0);
-
-				// Apply the local rotation to the wheel
-				wheel.quaternion = localRotation.mult(currentRotation)
+				steeringAngleSpeed = -steeringMax;
 			} else {
-				// No turning, stop the Y-axis rotation (keep X and Z intact)
-				// wheel.angularVelocity.set(currentAngularVelocity.x, 0, currentAngularVelocity.z);
+				steeringAngleSpeed = 0;
 			}
+
+			// Create the local rotation (rotate around the Y-axis)
+			const localRotation = new CANNON.Quaternion();
+			localRotation.setFromEuler(0, steeringAngleSpeed, 0);
+
+			// Apply the local rotation to the wheel
+			wheel.quaternion = localRotation.mult(currentRotation)
 		}
 	}
 }
@@ -826,8 +823,8 @@ window.toggleEngine = function () {
 }
 
 var updateGearButton = function () {
-	document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
-	document.getElementById("img-gear-reverse").style.display = gearPosition == 'R' ? 'block' : 'none'
+	// document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
+	// document.getElementById("img-gear-reverse").style.display = gearPosition == 'R' ? 'block' : 'none'
 }
 updateGearButton();
 
@@ -842,15 +839,16 @@ window.toggleGearPos = function () {
 
 
 window.pressGas = function () {
-	if (gearPosition == 'D')
-		isAccelerating = true;
-	else
-		isBraking = true;
+	isAccelerating = true;
 
 	tutorialStep2.style.display = 'none'; // Hide tutorial screen
 }
 
-window.releaseGas = function () {
+window.pressBrake = function () {
+	isBraking = true;
+}
+
+window.releasePedal = function () {
 	isAccelerating = false;
 	isBraking = false;
 }
@@ -869,6 +867,7 @@ window.releaseArrow = function () {
 
 // Get the button element (btnAccelerate)
 const btnAccelerate = document.getElementById('btnAccelerate');
+const btnBrake = document.getElementById('btnBrake');
 const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
 
@@ -876,9 +875,17 @@ const btnRight = document.getElementById('btnRight');
 btnAccelerate.addEventListener('touchstart', pressGas);
 btnAccelerate.addEventListener('mousedown', pressGas); // For desktop or mouse users
 
-btnAccelerate.addEventListener('touchend', releaseGas);
-btnAccelerate.addEventListener('mouseup', releaseGas); // For desktop or mouse users
-btnAccelerate.addEventListener('touchcancel', releaseGas); // Handle touch cancel event (e.g., user swipes away)
+btnAccelerate.addEventListener('touchend', releasePedal);
+btnAccelerate.addEventListener('mouseup', releasePedal); // For desktop or mouse users
+btnAccelerate.addEventListener('touchcancel', releasePedal); // Handle touch cancel event (e.g., user swipes away)
+
+
+btnBrake.addEventListener('touchstart', pressBrake);
+btnBrake.addEventListener('mousedown', pressBrake); // For desktop or mouse users
+
+btnBrake.addEventListener('touchend', releasePedal);
+btnBrake.addEventListener('mouseup', releasePedal); // For desktop or mouse users
+btnBrake.addEventListener('touchcancel', releasePedal); // Handle touch cancel event (e.g., user swipes away)
 
 
 btnLeft.addEventListener('touchstart', pressLeft);
