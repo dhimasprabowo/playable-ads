@@ -360,23 +360,29 @@ function updateObstaclesPos() {
 	}
 }
 
+// Car Params
+const POS_START = { x: 0, y: 2, z: -30 };
+
+const TORQUE_STRENGTH = 1200; // Adjust this value to increase or decrease the torque
+const BRAKE_STRENGTH = 2000; // Adjust this value to control braking force
+const STEERING_ANGLE = 0.15;
+const STEERING_SPEED = 0.0008;
+
 // Create materials for wheels and rods
 const rodWidth = 2.5;
 const rodHeight = 1;
 const rodSize = 6;
-const wheelMaterial = new CANNON.Material('wheel');
 const rodMaterial = new CANNON.Material();
+const wheelMaterial = new CANNON.Material('wheel');
 const wheelThickness = 0.3;
-const wheelRadius = 0.6;
+const wheelRadius = 1;
 const offsetXWheel = rodWidth / 2;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
 
-const posStart = { x: 0, y: 2, z: -30 };
-
 //set camera based on starting pos
-camera.position.set(posStart.x + 8, 5, posStart.z + 8);
-orbit.target.set(posStart.x, posStart.y + 2, posStart.z)
+camera.position.set(POS_START.x + 8, 5, POS_START.z + 8);
+orbit.target.set(POS_START.x, POS_START.y + 2, POS_START.z)
 orbit.update();
 
 // Number of wheels and positions
@@ -391,9 +397,9 @@ const wheelPositions = [];
 for (let i = 0; i < wheelLocalPositions.length; i++) {
 	wheelPositions.push(
 		{
-			x: wheelLocalPositions[i].x + posStart.x,
-			y: wheelLocalPositions[i].y + posStart.y,
-			z: wheelLocalPositions[i].z + posStart.z,
+			x: wheelLocalPositions[i].x + POS_START.x,
+			y: wheelLocalPositions[i].y + POS_START.y,
+			z: wheelLocalPositions[i].z + POS_START.z,
 		}
 	)
 }
@@ -407,7 +413,7 @@ for (let i = 0; i < wheelPositions.length; i++) {
 	const wheel = new CANNON.Body({
 		mass: 100,
 		material: wheelMaterial,
-		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 32),
+		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 128),
 	});
 	wheel.quaternion.setFromEuler(0, 0, Math.PI / 2); // Align wheels along the x-axis
 	wheel.position.set(wheelPositions[i].x, wheelPositions[i].y, wheelPositions[i].z);
@@ -420,7 +426,7 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 	groundBodyMaterial,     // Ground material
 	wheelMaterial,      // Wheel material
 	{
-		friction: 0.8,   // Friction between ground and wheels (adjustable)
+		friction: 0.9,   // Friction between ground and wheels (adjustable)
 		restitution: 0.01  // Bounciness (not necessary for friction but can be adjusted)
 	}
 );
@@ -463,12 +469,12 @@ for (let i = 0; i < wheelLocalPositions.length; i++) {
 
 // Connecting rod (Cannon.js & Three.js)
 const rod = new CANNON.Body({
-	mass: 500,
+	mass: 600,
 	material: rodMaterial,
 	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
 });
-rod.position.set(posStart.x, posStart.y, posStart.z);
-rod.linearDamping = 0.5;
+rod.position.set(POS_START.x, POS_START.y, POS_START.z);
+rod.linearDamping = 0.35;
 
 world.addBody(rod);
 
@@ -576,15 +582,12 @@ window.addEventListener('keyup', (event) => {
 
 // Function to apply torque to the back wheels
 function applyTorqueToBackWheels() {
-	const torqueStrength = 800; // Adjust this value to increase or decrease the torque
-	const brakeStrengthDefault = 2000; // Adjust this value to control braking force
-
 	// Apply torque to the back wheels (wheel 3 and wheel 4)
 	if (isAccelerating) {
 		for (let i = 0; i < wheels.length; i++) {
 			if (i >= 2) {
 				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
-				const localTorque = new CANNON.Vec3(0, -torqueStrength, 0);  // Apply along the local x-axis
+				const localTorque = new CANNON.Vec3(0, -TORQUE_STRENGTH, 0);  // Apply along the local x-axis
 
 				// Convert the local torque to world space using the body's quaternion
 				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
@@ -596,11 +599,11 @@ function applyTorqueToBackWheels() {
 	}
 
 	//controll braking/backward power
-	let brakeStrength = brakeStrengthDefault; // Adjust this value to control braking force
+	let brakeStrength = BRAKE_STRENGTH; // Adjust this value to control braking force
 	if (getCarSpeed().isForward)
-		brakeStrength = brakeStrengthDefault;
+		brakeStrength = BRAKE_STRENGTH;
 	else
-		brakeStrength = torqueStrength / 2;
+		brakeStrength = TORQUE_STRENGTH / 3;
 
 
 	// Apply brake (negative torque)
@@ -621,9 +624,9 @@ function applyTorqueToBackWheels() {
 }
 
 // Function to apply steering to the front wheels (rotate front wheels mesh only)
-function applySteering() {
-	const steeringAngleSpeed = 0.135; // Adjust this value to control the speed of steering
+var steeringAngleSpeed = 0; // Adjust this value to control the speed of steering
 
+function applySteering() {
 	// Apply angular velocity to the front wheels (index 0 and 1)
 	for (let i = 0; i < 2; i++) { // Only apply to front wheels
 		if (wheels[i]) {
@@ -633,23 +636,21 @@ function applySteering() {
 			let currentRotation = wheel.quaternion.clone();
 
 			if (isTurningLeft) {
-				// Create the local rotation (rotate around the Y-axis)
-				const localRotation = new CANNON.Quaternion();
-				localRotation.setFromEuler(0, steeringAngleSpeed, 0);
-
-				// Apply the local rotation to the wheel
-				wheel.quaternion = localRotation.mult(currentRotation)
+				if(steeringAngleSpeed < STEERING_ANGLE)
+					steeringAngleSpeed += STEERING_SPEED;
 			} else if (isTurningRight) {
-				// Create the local rotation (rotate around the Y-axis)
-				const localRotation = new CANNON.Quaternion();
-				localRotation.setFromEuler(0, -steeringAngleSpeed, 0);
-
-				// Apply the local rotation to the wheel
-				wheel.quaternion = localRotation.mult(currentRotation)
+				if(steeringAngleSpeed > -STEERING_ANGLE)
+					steeringAngleSpeed -= STEERING_SPEED;
 			} else {
-				// No turning, stop the Y-axis rotation (keep X and Z intact)
-				// wheel.angularVelocity.set(currentAngularVelocity.x, 0, currentAngularVelocity.z);
+				steeringAngleSpeed = 0;
 			}
+
+			// Create the local rotation (rotate around the Y-axis)
+			const localRotation = new CANNON.Quaternion();
+			localRotation.setFromEuler(0, steeringAngleSpeed, 0);
+
+			// Apply the local rotation to the wheel
+			wheel.quaternion = localRotation.mult(currentRotation)
 		}
 	}
 }
@@ -826,8 +827,8 @@ window.toggleEngine = function () {
 }
 
 var updateGearButton = function () {
-	document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
-	document.getElementById("img-gear-reverse").style.display = gearPosition == 'R' ? 'block' : 'none'
+	// document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
+	// document.getElementById("img-gear-reverse").style.display = gearPosition == 'R' ? 'block' : 'none'
 }
 updateGearButton();
 
@@ -842,15 +843,16 @@ window.toggleGearPos = function () {
 
 
 window.pressGas = function () {
-	if (gearPosition == 'D')
-		isAccelerating = true;
-	else
-		isBraking = true;
+	isAccelerating = true;
 
 	tutorialStep2.style.display = 'none'; // Hide tutorial screen
 }
 
-window.releaseGas = function () {
+window.pressBrake = function () {
+	isBraking = true;
+}
+
+window.releasePedal = function () {
 	isAccelerating = false;
 	isBraking = false;
 }
@@ -869,6 +871,7 @@ window.releaseArrow = function () {
 
 // Get the button element (btnAccelerate)
 const btnAccelerate = document.getElementById('btnAccelerate');
+const btnBrake = document.getElementById('btnBrake');
 const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
 
@@ -876,9 +879,17 @@ const btnRight = document.getElementById('btnRight');
 btnAccelerate.addEventListener('touchstart', pressGas);
 btnAccelerate.addEventListener('mousedown', pressGas); // For desktop or mouse users
 
-btnAccelerate.addEventListener('touchend', releaseGas);
-btnAccelerate.addEventListener('mouseup', releaseGas); // For desktop or mouse users
-btnAccelerate.addEventListener('touchcancel', releaseGas); // Handle touch cancel event (e.g., user swipes away)
+btnAccelerate.addEventListener('touchend', releasePedal);
+btnAccelerate.addEventListener('mouseup', releasePedal); // For desktop or mouse users
+btnAccelerate.addEventListener('touchcancel', releasePedal); // Handle touch cancel event (e.g., user swipes away)
+
+
+btnBrake.addEventListener('touchstart', pressBrake);
+btnBrake.addEventListener('mousedown', pressBrake); // For desktop or mouse users
+
+btnBrake.addEventListener('touchend', releasePedal);
+btnBrake.addEventListener('mouseup', releasePedal); // For desktop or mouse users
+btnBrake.addEventListener('touchcancel', releasePedal); // Handle touch cancel event (e.g., user swipes away)
 
 
 btnLeft.addEventListener('touchstart', pressLeft);
