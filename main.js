@@ -360,6 +360,14 @@ function updateObstaclesPos() {
 	}
 }
 
+// Car Params
+const POS_START = { x: 0, y: 2, z: -30 };
+
+const TORQUE_STRENGTH = 1200; // Adjust this value to increase or decrease the torque
+const BRAKE_STRENGTH = 2000; // Adjust this value to control braking force
+const STEERING_ANGLE = 0.15;
+const STEERING_SPEED = 0.0008;
+
 // Create materials for wheels and rods
 const rodWidth = 2.5;
 const rodHeight = 1;
@@ -372,11 +380,9 @@ const offsetXWheel = rodWidth / 2;
 const offsetYWheel = -0.5;
 const offsetZWheel = 2;
 
-const posStart = { x: 0, y: 2, z: -30 };
-
 //set camera based on starting pos
-camera.position.set(posStart.x + 8, 5, posStart.z + 8);
-orbit.target.set(posStart.x, posStart.y + 2, posStart.z)
+camera.position.set(POS_START.x + 8, 5, POS_START.z + 8);
+orbit.target.set(POS_START.x, POS_START.y + 2, POS_START.z)
 orbit.update();
 
 // Number of wheels and positions
@@ -391,9 +397,9 @@ const wheelPositions = [];
 for (let i = 0; i < wheelLocalPositions.length; i++) {
 	wheelPositions.push(
 		{
-			x: wheelLocalPositions[i].x + posStart.x,
-			y: wheelLocalPositions[i].y + posStart.y,
-			z: wheelLocalPositions[i].z + posStart.z,
+			x: wheelLocalPositions[i].x + POS_START.x,
+			y: wheelLocalPositions[i].y + POS_START.y,
+			z: wheelLocalPositions[i].z + POS_START.z,
 		}
 	)
 }
@@ -420,7 +426,7 @@ const wheelGroundContactMaterial = new CANNON.ContactMaterial(
 	groundBodyMaterial,     // Ground material
 	wheelMaterial,      // Wheel material
 	{
-		friction: 0.8,   // Friction between ground and wheels (adjustable)
+		friction: 0.9,   // Friction between ground and wheels (adjustable)
 		restitution: 0.01  // Bounciness (not necessary for friction but can be adjusted)
 	}
 );
@@ -463,11 +469,11 @@ for (let i = 0; i < wheelLocalPositions.length; i++) {
 
 // Connecting rod (Cannon.js & Three.js)
 const rod = new CANNON.Body({
-	mass: 500,
+	mass: 600,
 	material: rodMaterial,
 	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
 });
-rod.position.set(posStart.x, posStart.y, posStart.z);
+rod.position.set(POS_START.x, POS_START.y, POS_START.z);
 rod.linearDamping = 0.35;
 
 world.addBody(rod);
@@ -576,15 +582,12 @@ window.addEventListener('keyup', (event) => {
 
 // Function to apply torque to the back wheels
 function applyTorqueToBackWheels() {
-	const torqueStrength = 1200; // Adjust this value to increase or decrease the torque
-	const brakeStrengthDefault = 2000; // Adjust this value to control braking force
-
 	// Apply torque to the back wheels (wheel 3 and wheel 4)
 	if (isAccelerating) {
 		for (let i = 0; i < wheels.length; i++) {
 			if (i >= 2) {
 				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
-				const localTorque = new CANNON.Vec3(0, -torqueStrength, 0);  // Apply along the local x-axis
+				const localTorque = new CANNON.Vec3(0, -TORQUE_STRENGTH, 0);  // Apply along the local x-axis
 
 				// Convert the local torque to world space using the body's quaternion
 				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
@@ -596,11 +599,11 @@ function applyTorqueToBackWheels() {
 	}
 
 	//controll braking/backward power
-	let brakeStrength = brakeStrengthDefault; // Adjust this value to control braking force
+	let brakeStrength = BRAKE_STRENGTH; // Adjust this value to control braking force
 	if (getCarSpeed().isForward)
-		brakeStrength = brakeStrengthDefault;
+		brakeStrength = BRAKE_STRENGTH;
 	else
-		brakeStrength = torqueStrength / 2;
+		brakeStrength = TORQUE_STRENGTH / 3;
 
 
 	// Apply brake (negative torque)
@@ -621,7 +624,6 @@ function applyTorqueToBackWheels() {
 }
 
 // Function to apply steering to the front wheels (rotate front wheels mesh only)
-const steeringMax = 0.135;
 var steeringAngleSpeed = 0; // Adjust this value to control the speed of steering
 
 function applySteering() {
@@ -634,9 +636,11 @@ function applySteering() {
 			let currentRotation = wheel.quaternion.clone();
 
 			if (isTurningLeft) {
-				steeringAngleSpeed = steeringMax;
+				if(steeringAngleSpeed < STEERING_ANGLE)
+					steeringAngleSpeed += STEERING_SPEED;
 			} else if (isTurningRight) {
-				steeringAngleSpeed = -steeringMax;
+				if(steeringAngleSpeed > -STEERING_ANGLE)
+					steeringAngleSpeed -= STEERING_SPEED;
 			} else {
 				steeringAngleSpeed = 0;
 			}
