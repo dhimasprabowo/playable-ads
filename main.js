@@ -1,52 +1,55 @@
-// Import Three.js and Cannon.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-// Three.js setup
+// === THREE SETUP ===
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer();
+scene.background = new THREE.Color(0xbfd1e5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// Setup camera
+// === CAMERA SETUP ===
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-// camera.position.set(10, 10, 10); // Increase the Z position to move the camera further away from the car
-// camera.lookAt(new THREE.Vector3(0, 0, 0));
+camera.position.set(0, 5, -10);
+
+let targetCameraPosition = new THREE.Vector3();
+let targetCameraLookAt = new THREE.Vector3();
+
+// === CONTROLS ===
 const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
 
-// Limit the camera movement
-orbit.minPolarAngle = Math.PI / 6; // Limit up angle (in radians)
-orbit.maxPolarAngle = Math.PI / 2.2; // Limit ground (in radians)
-orbit.update();
-
-const SHOW_HELPER = false;
-
-if (SHOW_HELPER) {
-	const gridHelper = new THREE.GridHelper(50, 50);
-	scene.add(gridHelper);
-
-	const axesHelper = new THREE.AxesHelper(5);
-	scene.add(axesHelper);
-}
-
-// Load panoramic texture
-const skyLoader = new THREE.TextureLoader();
-skyLoader.load('assets/sky.jpg', function (texture) {
-	// Create a sphere to wrap the texture around
-	const geometry = new THREE.SphereGeometry(500, 60, 40);
-	geometry.scale(-1, 1, 1); // Invert the sphere to have the texture on the inside
-	const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-	const sky = new THREE.Mesh(geometry, material);
-
-	scene.add(sky);
-});
-
+// === LIGHTS ===
 // Add a light
-const light = new THREE.AmbientLight(0x404040, 50);  // Soft white light
+const light = new THREE.AmbientLight(0x404040, 10);  // Soft white light
 scene.add(light);
 
+// White directional light at half intensity shining from the top.
+const directionalLight = new THREE.DirectionalLight(0xffffff, 8);
+directionalLight.position.set(10, 30, 0);
+scene.add(directionalLight);
+
+// === CANNON SETUP ===
+const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
+
+// === GROUND ===
+const groundSize = 5000;
+const groundShape = new CANNON.Box(new CANNON.Vec3(groundSize / 2, 0.5, groundSize / 2));
+const groundBody = new CANNON.Body({ mass: 0 });
+groundBody.addShape(groundShape);
+groundBody.position.set(0, -0.5, 0);
+world.addBody(groundBody);
+
+/* const groundMat = new THREE.MeshStandardMaterial({ color: 0x999999 });
+const groundGeo = new THREE.PlaneGeometry(5000, 5000); // Match Cannon size
+const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+groundMesh.rotation.x = -Math.PI / 2;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh); */
 
 // Load the texture using TextureLoader
 const textureLoader = new THREE.TextureLoader();
@@ -138,44 +141,33 @@ groundLoader.load(
 	}
 )
 
-// Create an empty object (a parent container)
-var parkingSpot = new THREE.Object3D();
-parkingSpot.position.set(35, 0, 35);
-scene.add(parkingSpot);  // Add the empty object to the scene
+// === CHASSIS ===
+const chassisShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2));
+const chassisBody = new CANNON.Body({ mass: 150 });
+chassisBody.addShape(chassisShape);
+chassisBody.position.set(0, 1.5, -30);
+chassisBody.linearDamping = 0.15;
+chassisBody.allowSleep = true;
+chassisBody.sleepSpeedLimit = 0.1;  // below this speed = sleep
+chassisBody.sleepTimeLimit = 1;     // after 1s of inactivity
 
-const parkingLoader = new FBXLoader()
-parkingLoader.load(
-	'assets/ParkingSpot.fbx',
-	(object) => {
-		let scaleObj = 0.03;
-		object.scale.set(scaleObj, scaleObj, scaleObj)
-
-		parkingSpot.add(object)
-	},
-	(xhr) => {
-		console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-	},
-	(error) => {
-		console.log(error)
-	}
-)
+world.addBody(chassisBody);
 
 
-// Create an empty object (a parent container)
-var car3D = new THREE.Object3D();
-scene.add(car3D);  // Add the empty object to the scene
+var chassisMesh = new THREE.Object3D();
+scene.add(chassisMesh);  // Add the empty object to the scene
 
 const fbxLoader = new FBXLoader()
 fbxLoader.load(
 	'assets/SUV.fbx',
 	(object) => {
-		car3D.add(object)
+		chassisMesh.add(object)
 
 		let modelScale = 0.015;
 
 		object.scale.set(modelScale, modelScale, modelScale)
-		// object.position.x = 1.5
-		object.position.y = -1.2
+		// object.position.x = 0
+		object.position.y = -1
 		object.position.z = -0.45
 		// object.rotation.y = Math.PI
 		// object.rotation.z = 3.13
@@ -192,30 +184,190 @@ fbxLoader.load(
 	}
 )
 
-// Create ground
-const groundGeometry = new THREE.PlaneGeometry(50, 50);
-const groundMaterial = new THREE.MeshBasicMaterial({ color: 0xCCCCCC, side: THREE.DoubleSide });
-const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-groundMesh.rotation.x = -Math.PI / 2;
-// scene.add(groundMesh);
-
-// Cannon.js setup
-const world = new CANNON.World();
-world.gravity.set(0, -9.82, 0); // Gravity
-// world.gravity.set(0, 0, 0); // Gravity
-
-// Ground body
-const groundBodyMaterial = new CANNON.Material('ground');
-const groundBody = new CANNON.Body({
-	mass: 0,
-	material: groundBodyMaterial,
-	shape: new CANNON.Plane(),
-	position: new CANNON.Vec3(0, 0, 0)
+// === RAYCAST VEHICLE ===
+const vehicle = new CANNON.RaycastVehicle({
+	chassisBody: chassisBody,
+	indexRightAxis: 0,
+	indexUpAxis: 1,
+	indexForwardAxis: 2,
 });
-groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Directly set the rotation of the ground body
-world.addBody(groundBody);
 
-// Walls
+const wheelOptions = {
+	radius: 0.625,
+	directionLocal: new CANNON.Vec3(0, -1, 0),
+	suspensionStiffness: 30,
+	suspensionRestLength: 0.5,
+	frictionSlip: 9,
+	dampingRelaxation: 2.3,
+	dampingCompression: 4.4,
+	maxSuspensionForce: 100000,
+	rollInfluence: 0.01,
+	axleLocal: new CANNON.Vec3(-1, 0, 0),
+	maxSuspensionTravel: 0.3,
+	customSlidingRotationalSpeed: -30,
+	useCustomSlidingRotationalSpeed: true,
+};
+
+// Add 4 wheels
+const offsetX = 1.35;
+const offsetZ = 2.05;
+[
+	new CANNON.Vec3(-offsetX, 0, offsetZ),
+	new CANNON.Vec3(offsetX, 0, offsetZ),
+	new CANNON.Vec3(-offsetX, 0, -offsetZ),
+	new CANNON.Vec3(offsetX, 0, -offsetZ),
+].forEach(pos => {
+	wheelOptions.chassisConnectionPointLocal = pos.clone();
+	vehicle.addWheel(wheelOptions);
+});
+
+vehicle.addToWorld(world);
+
+// === WHEEL VISUALS ===
+function createWheelVisual(_index) {
+	//create container
+	var container = new THREE.Object3D();
+
+	const fbxLoaderWheel = new FBXLoader()
+	fbxLoaderWheel.load(
+		'assets/Wheel-R.fbx',
+		(object) => {
+			container.add(object)
+			scene.add(container);  // Add the empty object to the scene
+
+			let modelScale = 0.015;
+			object.scale.set(modelScale, modelScale, modelScale)
+
+			// console.log("test", _index);
+			if (_index % 2 != 0)
+				object.rotation.y = Math.PI;
+
+		},
+		(xhr) => {
+			let progress = (xhr.loaded / xhr.total) * 100;
+			// console.log(progress + '% loaded')
+		},
+		(error) => {
+			console.log(error)
+		}
+	)
+
+
+	return container;
+}
+
+const wheelMeshes = vehicle.wheelInfos.map((wheel, index) => {
+	// console.log("test", index);
+	const mesh = createWheelVisual(index);
+	scene.add(mesh);
+	return mesh;
+});
+
+// === CONTROLS ===
+const keys = { w: false, s: false, a: false, d: false };
+
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+// === ANIMATE ===
+const clock = new THREE.Clock();
+let currentSteering = 0;
+
+function animate() {
+	requestAnimationFrame(animate);
+
+	const delta = clock.getDelta();
+	world.step(1 / 60, delta, 5);
+
+	// === VEHICLE CONTROLS ===
+	const force = 800;
+	const maxSteer = 0.45;
+	const steerSpeed = 5; // higher is faster response
+
+	if (engineOn) {
+		
+		// Engine force
+		if (keys.w || isAccelerating) {
+			vehicle.applyEngineForce(-force, 2);
+			vehicle.applyEngineForce(-force, 3);
+		} 
+		if (keys.s || isBraking) {
+			vehicle.applyEngineForce(force, 2);
+			vehicle.applyEngineForce(force, 3);
+		} 
+		if(!keys.w && !isAccelerating && !keys.s && !isBraking) {
+			vehicle.applyEngineForce(0, 2);
+			vehicle.applyEngineForce(0, 3);
+		}
+
+		
+		// Steering (smooth)
+		let targetSteering = 0;
+		if (keys.a || isTurningLeft) {
+			targetSteering = maxSteer;
+		} else if (keys.d || isTurningRight) {
+			targetSteering = -maxSteer;
+		}
+		currentSteering = THREE.MathUtils.lerp(currentSteering, targetSteering, delta * steerSpeed);
+	}
+
+	vehicle.setSteeringValue(currentSteering, 0);
+	vehicle.setSteeringValue(currentSteering, 1);
+
+	// === SYNC MESHES ===
+	chassisMesh.position.copy(chassisBody.position);
+	chassisMesh.quaternion.copy(chassisBody.quaternion);
+
+	for (let i = 0; i < vehicle.wheelInfos.length; i++) {
+		vehicle.updateWheelTransform(i);
+		const t = vehicle.wheelInfos[i].worldTransform;
+		wheelMeshes[i].position.copy(t.position);
+		wheelMeshes[i].quaternion.copy(t.quaternion);
+	}
+
+	//suppose to help with wiggling
+	/* if (chassisBody.velocity.length() < 0.05 && !keys.w && !keys.s && !keys.a && !keys.d) {
+		for (let i = 0; i < 4; i++) {
+			vehicle.applyEngineForce(0, i);
+			vehicle.setSteeringValue(0, i);
+		}
+		chassisBody.velocity.set(0, 0, 0);
+		chassisBody.angularVelocity.set(0, 0, 0);
+	} */
+
+
+	orbit.update();
+
+
+
+	// === SYNC ===
+	checkCompletion();
+	updateObstaclesPos();
+
+	// === CAMERA FOLLOW ===
+	if (true) {
+		// Smooth camera follow
+		let followDistance = 12; // Distance behind the model
+		let heightOffset = 6; // Height offset above the model
+
+		// Calculate the target camera position (behind the model)
+		const cameraOffset = new THREE.Vector3(0, heightOffset, -followDistance); // Local offset in model space
+		cameraOffset.applyQuaternion(chassisMesh.quaternion); // Rotate to align with model's orientation
+		targetCameraPosition.copy(chassisMesh.position).add(cameraOffset);
+
+		// Interpolate (lerp) the camera's position for smooth movement
+		camera.position.lerp(targetCameraPosition, 0.025);
+
+		// Set the camera to look at the model
+		targetCameraLookAt.copy(chassisMesh.position);
+		targetCameraLookAt.y += 2; //add offset
+		camera.lookAt(targetCameraLookAt);
+	}
+
+	renderer.render(scene, camera);
+}
+
+// === WALLS ===
 var wallBodies = [];
 var wallMeshes = [];
 const wallData = [
@@ -242,7 +394,7 @@ for (let i = 0; i < wallData.length; i++) {
 
 	//handle collision
 	wall.addEventListener("collide", function (e) {
-		if (e.body == rod) {
+		if (e.body == chassisBody) {
 			showGameOver();
 		}
 	});
@@ -253,8 +405,8 @@ for (let i = 0; i < wallData.length; i++) {
 		new THREE.MeshBasicMaterial({ color: 0x0000ff })
 	);
 
-	if (SHOW_HELPER)
-		scene.add(wallMesh);
+	// if (SHOW_HELPER)
+	// 	scene.add(wallMesh);
 
 	wallMeshes.push(wallMesh);
 }
@@ -266,8 +418,62 @@ function updateWallMeshesPos() {
 		wallMeshes[i].quaternion.copy(wallBodies[i].quaternion);
 	}
 }
+updateWallMeshesPos();
 
-// Obstacles
+// === PARKING SPOT ===
+var parkingSpot = new THREE.Object3D();
+parkingSpot.position.set(35, 0, 35);
+scene.add(parkingSpot);  // Add the empty object to the scene
+
+const parkingLoader = new FBXLoader()
+parkingLoader.load(
+	'assets/ParkingSpot.fbx',
+	(object) => {
+		let scaleObj = 0.03;
+		object.scale.set(scaleObj, scaleObj, scaleObj)
+
+		parkingSpot.add(object)
+	},
+	(xhr) => {
+		console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+	},
+	(error) => {
+		console.log(error)
+	}
+)
+
+function checkCompletion() {
+	if (parkingSpot) {
+		var angleInDegrees = 0;
+		var angleTolerance = 2;
+		var distanceTolerance = 1.5;
+
+		if (chassisMesh.position.distanceTo(parkingSpot.position) < 5) {
+
+			// Step 1: Convert the Euler rotations to quaternions
+			const quaternion1 = new THREE.Quaternion().setFromEuler(chassisMesh.rotation); // Convert object1's Euler rotation to quaternion
+			const quaternion2 = new THREE.Quaternion().setFromEuler(parkingSpot.rotation); // Convert object2's Euler rotation to quaternion
+
+			// Step 2: Calculate the angle between the two quaternions using the angleTo() method
+			const angle = quaternion1.angleTo(quaternion2); // This gives the angle in radians
+
+			// If you need the angle in degrees:
+			angleInDegrees = THREE.MathUtils.radToDeg(angle);
+
+			// console.log(`Rotation difference in radians: ${angle}`);
+			// console.log(`Rotation difference in degrees: ${angleInDegrees}`);
+
+			if (angleInDegrees < angleTolerance && chassisMesh.position.distanceTo(parkingSpot.position) < distanceTolerance) {
+				showGameOver(true);
+			}
+
+			completionDisplay.style.display = 'flex'
+			completion.textContent = Math.floor(100 - Math.abs(angleInDegrees - angleTolerance)) + '%'
+		}
+	}
+}
+
+// === OBSTACLES ===
 var obstacleBodies = [];
 var obstacleMeshes = [];
 var obstacleObj3D = [];
@@ -303,7 +509,7 @@ for (let i = 0; i < obstacleData.length; i++) {
 
 	// Handle collision
 	obstacle.addEventListener("collide", function (e) {
-		if (e.body == rod) {
+		if (e.body == chassisBody) {
 			showGameOver();
 		}
 	});
@@ -314,7 +520,7 @@ for (let i = 0; i < obstacleData.length; i++) {
 		new THREE.MeshBasicMaterial({ color: 0x0000ff })
 	);
 
-	if (SHOW_HELPER) scene.add(obstacleMesh);
+	// if (SHOW_HELPER) scene.add(obstacleMesh);
 	obstacleMeshes.push(obstacleMesh);
 
 	// Set the position and rotation for visual representation
@@ -360,171 +566,16 @@ function updateObstaclesPos() {
 	}
 }
 
-// Car Params
-const POS_START = { x: 0, y: 2, z: -30 };
 
-const TORQUE_STRENGTH = 1200; // Adjust this value to increase or decrease the torque
-const BRAKE_STRENGTH = 2000; // Adjust this value to control braking force
-const STEERING_ANGLE = 0.15;
-const STEERING_SPEED = 0.0008;
+animate();
 
-// Create materials for wheels and rods
-const rodWidth = 2.5;
-const rodHeight = 1;
-const rodSize = 6;
-const rodMaterial = new CANNON.Material();
-const wheelMaterial = new CANNON.Material('wheel');
-const wheelThickness = 0.3;
-const wheelRadius = 1;
-const offsetXWheel = rodWidth / 2;
-const offsetYWheel = -0.5;
-const offsetZWheel = 2;
 
-//set camera based on starting pos
-camera.position.set(POS_START.x + 8, 5, POS_START.z + 8);
-orbit.target.set(POS_START.x, POS_START.y + 2, POS_START.z)
-orbit.update();
-
-// Number of wheels and positions
-const wheelLocalPositions = [
-	{ x: -offsetXWheel, y: offsetYWheel, z: offsetZWheel }, // Position for wheel 1
-	{ x: offsetXWheel, y: offsetYWheel, z: offsetZWheel },   // Position for wheel 2
-	{ x: -offsetXWheel, y: offsetYWheel, z: -offsetZWheel },   // Position for wheel 3
-	{ x: offsetXWheel, y: offsetYWheel, z: -offsetZWheel },   // Position for wheel 4
-];
-
-const wheelPositions = [];
-for (let i = 0; i < wheelLocalPositions.length; i++) {
-	wheelPositions.push(
-		{
-			x: wheelLocalPositions[i].x + POS_START.x,
-			y: wheelLocalPositions[i].y + POS_START.y,
-			z: wheelLocalPositions[i].z + POS_START.z,
-		}
-	)
-}
-
-// Create arrays for wheels and wheel meshes
-const wheels = [];
-
-// Loop to create wheels and wheel meshes
-for (let i = 0; i < wheelPositions.length; i++) {
-	// Cannon.js wheel creation
-	const wheel = new CANNON.Body({
-		mass: 100,
-		material: wheelMaterial,
-		shape: new CANNON.Cylinder(wheelRadius, wheelRadius, wheelThickness, 128),
-	});
-	wheel.quaternion.setFromEuler(0, 0, Math.PI / 2); // Align wheels along the x-axis
-	wheel.position.set(wheelPositions[i].x, wheelPositions[i].y, wheelPositions[i].z);
-	world.addBody(wheel);
-	wheels.push(wheel);
-}
-
-// Create a contact material between the ground and the wheels
-const wheelGroundContactMaterial = new CANNON.ContactMaterial(
-	groundBodyMaterial,     // Ground material
-	wheelMaterial,      // Wheel material
-	{
-		friction: 0.9,   // Friction between ground and wheels (adjustable)
-		restitution: 0.01  // Bounciness (not necessary for friction but can be adjusted)
-	}
-);
-
-// Add the contact material to the world
-world.addContactMaterial(wheelGroundContactMaterial);
-
-//handle wheels model
-var wheelsModel = []
-for (let i = 0; i < wheelLocalPositions.length; i++) {
-	const fbxLoaderWheel = new FBXLoader()
-	fbxLoaderWheel.load(
-		'assets/Wheel-R.fbx',
-		(object) => {
-			//create container
-			var wheelObj = new THREE.Object3D();
-			scene.add(wheelObj);  // Add the empty object to the scene
-
-			wheelObj.add(object)
-
-			let modelScale = 0.015;
-
-			object.scale.set(modelScale, modelScale, modelScale)
-			if (wheelLocalPositions[i].x < 0)
-				object.rotation.z = Math.PI / 2
-			else
-				object.rotation.z = -Math.PI / 2
-
-			wheelsModel.push(wheelObj);
-		},
-		(xhr) => {
-			let progress = (xhr.loaded / xhr.total) * 100;
-			// console.log(progress + '% loaded')
-		},
-		(error) => {
-			console.log(error)
-		}
-	)
-}
-
-// Connecting rod (Cannon.js & Three.js)
-const rod = new CANNON.Body({
-	mass: 600,
-	material: rodMaterial,
-	shape: new CANNON.Box(new CANNON.Vec3(rodWidth / 2, rodHeight / 2, rodSize / 2)),
-});
-rod.position.set(POS_START.x, POS_START.y, POS_START.z);
-rod.linearDamping = 0.35;
-
-world.addBody(rod);
-
-const rodMesh = new THREE.Mesh(
-	new THREE.BoxGeometry(rodWidth, rodHeight, rodSize),
-	new THREE.MeshBasicMaterial({ color: 0x0000ff })
-);
-
-if (SHOW_HELPER)
-	scene.add(rodMesh);
-
-// Hinge Joints for the wheels
-const axisWheel = new CANNON.Vec3(0, 1, 0); // Axis of rotation (vertical axis)
-const axisRod = new CANNON.Vec3(1, 0, 0); // Axis of rotation (horizontal axis)
-
-// Loop to create hinge joints for each wheel
-for (let i = 0; i < wheelLocalPositions.length; i++) {
-	const offsetX = wheelLocalPositions[i].x < 0 ? offsetXWheel : -offsetXWheel;
-	const offsetZ = i < 2 ? offsetZWheel : -offsetZWheel; //pos Z for front or back wheels
-
-	const hinge = new CANNON.HingeConstraint(wheels[i], rod, {
-		pivotA: new CANNON.Vec3(0, 0, 0),
-		pivotB: new CANNON.Vec3(offsetX, offsetYWheel, offsetZ),
-		axisA: axisWheel,
-		axisB: axisRod,
-	});
-
-	world.addConstraint(hinge);
-}
-
-// Update Three.js objects from Cannon.js bodies
-function updateMeshesFromBodies() {
-	rodMesh.position.copy(rod.position);
-	rodMesh.quaternion.copy(rod.quaternion);
-
-	car3D.position.copy(rod.position);
-	car3D.quaternion.copy(rod.quaternion);
-
-	for (let i = 0; i < wheelsModel.length; i++) {
-		wheelsModel[i].position.copy(wheels[i].position);
-		wheelsModel[i].quaternion.copy(wheels[i].quaternion);
-	}
-}
-
+//=== UI ===
 var isGameOver = false;
 var engineOn = false;
 var gearPosition = 'D'
 var showTutorial = true;
 
-// Get the screen element
 const controlScreen = document.getElementById('controlScreen');
 const tutorialStep1 = document.getElementById('tutorialStep1');
 const tutorialStep2 = document.getElementById('tutorialStep2');
@@ -533,264 +584,6 @@ const completeScreen = document.getElementById('completeScreen');
 const loadingScreen = document.getElementById('loadingScreen');
 const completionDisplay = document.getElementById('completionDisplay');
 var completion = completionDisplay.children[1];
-
-// Additional setup for controlling car's back wheels
-let isAccelerating = false;
-let isBraking = false;
-let isTurningLeft = false;
-let isTurningRight = false;
-
-// Listen for keyboard events
-window.addEventListener('keydown', (event) => {
-	if (event.key === 'ArrowUp' || event.key === 'w') {
-		isAccelerating = true;
-
-		//update UI
-		gearPosition = 'D';
-		updateGearButton();
-		tutorialStep2.style.display = 'none'; // Hide tutorial screen
-	}
-	if (event.key === 'ArrowDown' || event.key === 's') {
-		isBraking = true;
-
-		//update UI
-		gearPosition = 'R';
-		updateGearButton();
-	}
-	if (event.key === 'ArrowLeft' || event.key === 'a') {
-		isTurningLeft = true;
-	}
-	if (event.key === 'ArrowRight' || event.key === 'd') {
-		isTurningRight = true;
-	}
-});
-
-window.addEventListener('keyup', (event) => {
-	if (event.key === 'ArrowUp' || event.key === 'w') {
-		isAccelerating = false;
-	}
-	if (event.key === 'ArrowDown' || event.key === 's') {
-		isBraking = false;
-	}
-	if (event.key === 'ArrowLeft' || event.key === 'a') {
-		isTurningLeft = false;
-	}
-	if (event.key === 'ArrowRight' || event.key === 'd') {
-		isTurningRight = false;
-	}
-});
-
-// Function to apply torque to the back wheels
-function applyTorqueToBackWheels() {
-	// Apply torque to the back wheels (wheel 3 and wheel 4)
-	if (isAccelerating) {
-		for (let i = 0; i < wheels.length; i++) {
-			if (i >= 2) {
-				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
-				const localTorque = new CANNON.Vec3(0, -TORQUE_STRENGTH, 0);  // Apply along the local x-axis
-
-				// Convert the local torque to world space using the body's quaternion
-				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
-
-				// Apply the world space torque to the body
-				wheels[i].applyTorque(worldTorque);
-			}
-		}
-	}
-
-	//controll braking/backward power
-	let brakeStrength = BRAKE_STRENGTH; // Adjust this value to control braking force
-	if (getCarSpeed().isForward)
-		brakeStrength = BRAKE_STRENGTH;
-	else
-		brakeStrength = TORQUE_STRENGTH / 3;
-
-
-	// Apply brake (negative torque)
-	if (isBraking) {
-		for (let i = 0; i < wheels.length; i++) {
-			if (i >= 2) {
-				// Define a local torque vector (e.g., applying torque along the x-axis in local space)
-				const localTorque = new CANNON.Vec3(0, brakeStrength, 0);  // Apply along the local x-axis
-
-				// Convert the local torque to world space using the body's quaternion
-				const worldTorque = wheels[i].quaternion.vmult(localTorque);  // vmult() rotates the vector to world space
-
-				// Apply the world space torque to the body
-				wheels[i].applyTorque(worldTorque);
-			}
-		}
-	}
-}
-
-// Function to apply steering to the front wheels (rotate front wheels mesh only)
-var steeringAngleSpeed = 0; // Adjust this value to control the speed of steering
-
-function applySteering() {
-	// Apply angular velocity to the front wheels (index 0 and 1)
-	for (let i = 0; i < 2; i++) { // Only apply to front wheels
-		if (wheels[i]) {
-			const wheel = wheels[i];
-
-			// Get the current rotation quaternion of the wheel
-			let currentRotation = wheel.quaternion.clone();
-
-			if (isTurningLeft) {
-				if(steeringAngleSpeed < STEERING_ANGLE)
-					steeringAngleSpeed += STEERING_SPEED;
-			} else if (isTurningRight) {
-				if(steeringAngleSpeed > -STEERING_ANGLE)
-					steeringAngleSpeed -= STEERING_SPEED;
-			} else {
-				steeringAngleSpeed = 0;
-			}
-
-			// Create the local rotation (rotate around the Y-axis)
-			const localRotation = new CANNON.Quaternion();
-			localRotation.setFromEuler(0, steeringAngleSpeed, 0);
-
-			// Apply the local rotation to the wheel
-			wheel.quaternion = localRotation.mult(currentRotation)
-		}
-	}
-}
-
-function getCarSpeed() {
-	let velocity = {
-		speed: 0,
-		isForward: false,
-		isBackward: false,
-		isStationary: false,
-	};
-
-	// Get the world-space velocity of the car's rod
-	const worldVelocity = rod.velocity;
-
-	// Get the car's quaternion (rotation) from the rod's physics body
-	const carRotation = rod.quaternion;
-
-	// Invert the quaternion to transform from world space to local space
-	const inverseRotation = carRotation.clone().inverse();
-
-	// Now, transform the velocity from world space to local space
-	const localVelocity = inverseRotation.vmult(worldVelocity);
-
-	// Check if the car is moving forward or backward
-	if (localVelocity.z > 0) {
-		// console.log("The car is moving forward");
-		velocity.isForward = true;
-		velocity.isBackward = false;
-		velocity.isStationary = false;
-	} else if (localVelocity.z < 0) {
-		// console.log("The car is moving backward");
-		velocity.isForward = false;
-		velocity.isBackward = true;
-		velocity.isStationary = false;
-	} else {
-		// console.log("The car is not moving (velocity along Z-axis is zero)");
-		velocity.isForward = false;
-		velocity.isBackward = false;
-		velocity.isStationary = true;
-	}
-
-	// Get the car's forward direction (assuming the car's forward direction is along the Z axis)
-	const forwardDirection = new CANNON.Vec3(0, 0, 1); // Assuming car is moving along the Z axis
-
-	// Calculate the speed in the forward direction
-	velocity.speed = localVelocity.dot(forwardDirection);
-
-	return velocity;
-}
-
-
-let targetCameraPosition = new THREE.Vector3();
-let targetCameraLookAt = new THREE.Vector3();
-
-// Modify the render loop to include applying torque and steering
-function animate() {
-	requestAnimationFrame(animate);
-	world.step(1 / 60); // Step the physics world forward
-
-	if (engineOn) {
-		applyTorqueToBackWheels(); // Apply torque when accelerating or braking
-		applySteering(); // Apply steering when turning
-
-
-		// Smooth camera follow
-		let followDistance = 12; // Distance behind the model
-		let heightOffset = 6; // Height offset above the model
-
-		// Calculate the target camera position (behind the model)
-		const cameraOffset = new THREE.Vector3(0, heightOffset, -followDistance); // Local offset in model space
-		cameraOffset.applyQuaternion(car3D.quaternion); // Rotate to align with model's orientation
-		targetCameraPosition.copy(car3D.position).add(cameraOffset);
-
-		// Interpolate (lerp) the camera's position for smooth movement
-		camera.position.lerp(targetCameraPosition, 0.05);
-
-		// Set the camera to look at the model
-		targetCameraLookAt.copy(car3D.position);
-		targetCameraLookAt.y += 2; //add offset
-		camera.lookAt(targetCameraLookAt);
-	}
-
-	updateMeshesFromBodies(); // Sync meshes with physics bodies
-
-	updateWallMeshesPos();
-
-	updateObstaclesPos();
-
-	if (parkingSpot) {
-		var angleInDegrees = 0;
-		var angleTolerance = 2;
-		var distanceTolerance = 1.5;
-
-		// console.log(car3D.position.distanceTo(parkingSpot.position));
-		if (car3D.position.distanceTo(parkingSpot.position) < 5) {
-
-			// Step 1: Convert the Euler rotations to quaternions
-			const quaternion1 = new THREE.Quaternion().setFromEuler(car3D.rotation); // Convert object1's Euler rotation to quaternion
-			const quaternion2 = new THREE.Quaternion().setFromEuler(parkingSpot.rotation); // Convert object2's Euler rotation to quaternion
-
-			// Step 2: Calculate the angle between the two quaternions using the angleTo() method
-			const angle = quaternion1.angleTo(quaternion2); // This gives the angle in radians
-
-			// If you need the angle in degrees:
-			angleInDegrees = THREE.MathUtils.radToDeg(angle);
-
-			// console.log(`Rotation difference in radians: ${angle}`);
-			// console.log(`Rotation difference in degrees: ${angleInDegrees}`);
-
-			if (angleInDegrees < angleTolerance && car3D.position.distanceTo(parkingSpot.position) < distanceTolerance) {
-				showGameOver(true);
-			}
-
-			completionDisplay.style.display = 'flex'
-			completion.textContent = Math.floor(100 - Math.abs(angleInDegrees - angleTolerance)) + '%'
-		}
-	}
-
-	// Sync ground mesh with the physics body
-	groundMesh.quaternion.copy(groundBody.quaternion);
-	renderer.render(scene, camera);
-}
-
-animate();
-
-function showGameOver(success = false) {
-	controlScreen.style.display = 'none'; // hide control canvas
-
-	if (success)
-		completeScreen.style.display = 'flex';
-	else
-		endScreen.style.display = 'flex';
-
-	engineOn = false;
-	updateEngineButton();
-
-	isGameOver = true;
-}
-
 
 function updateEngineButton() {
 	document.getElementById("img-engine-off").style.display = engineOn ? 'none' : 'block'
@@ -825,6 +618,26 @@ window.toggleEngine = function () {
 	//toggle orbit camera control
 	orbit.enabled = !engineOn;
 }
+
+function showGameOver(success = false) {
+	controlScreen.style.display = 'none'; // hide control canvas
+
+	if (success)
+		completeScreen.style.display = 'flex';
+	else
+		endScreen.style.display = 'flex';
+
+	// engineOn = false;
+	// updateEngineButton();
+
+	isGameOver = true;
+}
+
+// Additional setup for controlling car's back wheels
+let isAccelerating = false;
+let isBraking = false;
+let isTurningLeft = false;
+let isTurningRight = false;
 
 var updateGearButton = function () {
 	// document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
@@ -906,9 +719,3 @@ btnRight.addEventListener('mousedown', pressRight); // For desktop or mouse user
 btnRight.addEventListener('touchend', releaseArrow);
 btnRight.addEventListener('mouseup', releaseArrow); // For desktop or mouse users
 btnRight.addEventListener('touchcancel', releaseArrow); // Handle touch cancel event (e.g., user swipes away)
-
-// Prevent the context menu from appearing on right-click or long press
-window.addEventListener('contextmenu', function (event) {
-	event.preventDefault(); // Prevent the context menu
-});
-
