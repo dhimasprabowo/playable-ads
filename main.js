@@ -201,7 +201,7 @@ const wheelOptions = {
 	dampingRelaxation: 2.3,
 	dampingCompression: 4.4,
 	maxSuspensionForce: 100000,
-	rollInfluence: 0.01,
+	rollInfluence: 0.5,
 	axleLocal: new CANNON.Vec3(-1, 0, 0),
 	maxSuspensionTravel: 0.3,
 	customSlidingRotationalSpeed: -30,
@@ -273,6 +273,12 @@ window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 const clock = new THREE.Clock();
 let currentSteering = 0;
 
+// Additional setup for controlling car's back wheels
+let isAccelerating = false;
+let isBraking = false;
+let isTurningLeft = false;
+let isTurningRight = false;
+
 function animate() {
 	requestAnimationFrame(animate);
 
@@ -284,28 +290,33 @@ function animate() {
 	const maxSteer = 0.45;
 	const steerSpeed = 5; // higher is faster response
 
+	let inputForward = keys.w || isAccelerating;
+	let inputBackward = keys.s || isBraking;
+	let inputTurningLeft = keys.a || isTurningLeft;
+	let inputTurningRight = keys.d || isTurningRight;
+
+	let isAnyInput = inputForward || inputBackward || inputTurningLeft || inputTurningRight;
+
 	if (engineOn) {
-		
+
 		// Engine force
-		if (keys.w || isAccelerating) {
+		if (inputForward) {
 			vehicle.applyEngineForce(-force, 2);
 			vehicle.applyEngineForce(-force, 3);
-		} 
-		if (keys.s || isBraking) {
+		} else if (inputBackward) {
 			vehicle.applyEngineForce(force, 2);
 			vehicle.applyEngineForce(force, 3);
-		} 
-		if(!keys.w && !isAccelerating && !keys.s && !isBraking) {
+		} else {
 			vehicle.applyEngineForce(0, 2);
 			vehicle.applyEngineForce(0, 3);
 		}
 
-		
+
 		// Steering (smooth)
 		let targetSteering = 0;
-		if (keys.a || isTurningLeft) {
+		if (inputTurningLeft) {
 			targetSteering = maxSteer;
-		} else if (keys.d || isTurningRight) {
+		} else if (inputTurningRight) {
 			targetSteering = -maxSteer;
 		}
 		currentSteering = THREE.MathUtils.lerp(currentSteering, targetSteering, delta * steerSpeed);
@@ -326,14 +337,14 @@ function animate() {
 	}
 
 	//suppose to help with wiggling
-	/* if (chassisBody.velocity.length() < 0.05 && !keys.w && !keys.s && !keys.a && !keys.d) {
+	if (chassisBody.velocity.length() < 0.5 && !isAnyInput) {
 		for (let i = 0; i < 4; i++) {
 			vehicle.applyEngineForce(0, i);
 			vehicle.setSteeringValue(0, i);
 		}
 		chassisBody.velocity.set(0, 0, 0);
 		chassisBody.angularVelocity.set(0, 0, 0);
-	} */
+	}
 
 
 	orbit.update();
@@ -632,12 +643,6 @@ function showGameOver(success = false) {
 
 	isGameOver = true;
 }
-
-// Additional setup for controlling car's back wheels
-let isAccelerating = false;
-let isBraking = false;
-let isTurningLeft = false;
-let isTurningRight = false;
 
 var updateGearButton = function () {
 	// document.getElementById("img-gear-drive").style.display = gearPosition == 'D' ? 'block' : 'none'
