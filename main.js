@@ -13,15 +13,17 @@ renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
 // === CAMERA SETUP ===
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 5, -10);
-
 let targetCameraPosition = new THREE.Vector3();
 let targetCameraLookAt = new THREE.Vector3();
 
-// === CONTROLS ===
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(8, 5, -20);
+
+// camera control
 const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
+orbit.target.set(0,2,-30) 
+
 
 // === LIGHTS ===
 // Add a light
@@ -186,26 +188,27 @@ fbxLoader.load(
 
 // === RAYCAST VEHICLE ===
 const vehicle = new CANNON.RaycastVehicle({
-	chassisBody: chassisBody,
-	indexRightAxis: 0,
-	indexUpAxis: 1,
-	indexForwardAxis: 2,
+    chassisBody: chassisBody,         // The physics body representing the car chassis
+    indexRightAxis: 0,                // Local x-axis (right)
+    indexUpAxis: 1,                   // Local y-axis (up)
+    indexForwardAxis: 2              // Local z-axis (forward)
 });
 
+// Define common wheel options for all four wheels
 const wheelOptions = {
-	radius: 0.625,
-	directionLocal: new CANNON.Vec3(0, -1, 0),
-	suspensionStiffness: 30,
-	suspensionRestLength: 0.5,
-	frictionSlip: 9,
-	dampingRelaxation: 2.3,
-	dampingCompression: 4.4,
-	maxSuspensionForce: 100000,
-	rollInfluence: 0.5,
-	axleLocal: new CANNON.Vec3(-1, 0, 0),
-	maxSuspensionTravel: 0.3,
-	customSlidingRotationalSpeed: -30,
-	useCustomSlidingRotationalSpeed: true,
+    radius: 0.625,                            // Radius of the wheel
+    directionLocal: new CANNON.Vec3(0, -1, 0), // Direction of the suspension (downward in local space)
+    suspensionStiffness: 30,                 // Stiffness of the suspension spring
+    suspensionRestLength: 0.5,               // Rest length of the suspension (how much travel it has at rest)
+    frictionSlip: 9,                         // Friction/grip of the tires (higher = more grip)
+    dampingRelaxation: 2.3,                  // Suspension rebound damping (how quickly it returns to rest)
+    dampingCompression: 4.4,                 // Damping when suspension is compressed (absorbs impact)
+    maxSuspensionForce: 100000,              // Max force the suspension can apply
+    rollInfluence: 0.5,                      // How much body roll affects the vehicle
+    axleLocal: new CANNON.Vec3(-1, 0, 0),     // Direction the wheels spin (typically left in local space)
+    maxSuspensionTravel: 0.3,                // Maximum distance suspension can travel from rest
+    customSlidingRotationalSpeed: -30,       // Speed at which wheels spin when sliding
+    useCustomSlidingRotationalSpeed: true    // Enable the custom sliding speed
 };
 
 // Add 4 wheels
@@ -356,7 +359,7 @@ function animate() {
 	updateObstaclesPos();
 
 	// === CAMERA FOLLOW ===
-	if (true) {
+	if (engineOn) {
 		// Smooth camera follow
 		let followDistance = 12; // Distance behind the model
 		let heightOffset = 6; // Height offset above the model
