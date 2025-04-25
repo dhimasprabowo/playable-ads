@@ -204,7 +204,7 @@ const wheelOptions = {
     dampingRelaxation: 2.3,                  // Suspension rebound damping (how quickly it returns to rest)
     dampingCompression: 4.4,                 // Damping when suspension is compressed (absorbs impact)
     maxSuspensionForce: 100000,              // Max force the suspension can apply
-    rollInfluence: 0.5,                      // How much body roll affects the vehicle
+    rollInfluence: 0.125,                      // How much body roll affects the vehicle
     axleLocal: new CANNON.Vec3(-1, 0, 0),     // Direction the wheels spin (typically left in local space)
     maxSuspensionTravel: 0.3,                // Maximum distance suspension can travel from rest
     customSlidingRotationalSpeed: -30,       // Speed at which wheels spin when sliding
@@ -282,6 +282,20 @@ let isBraking = false;
 let isTurningLeft = false;
 let isTurningRight = false;
 
+function isCarFlippedAndStopped(body) {
+    // 1. Check if the car is upside down
+    const up = new CANNON.Vec3(0, 1, 0);                  // Local up vector
+    const worldUp = body.quaternion.vmult(up);           // Convert to world space
+    const upsideDown = worldUp.y < 0;
+
+    // 2. Check if the car is not moving
+    const speed = body.velocity.length();                // Get speed
+    const isStopped = speed < 0.1;                       // Consider near zero
+
+    return upsideDown && isStopped;
+}
+
+
 function animate() {
 	requestAnimationFrame(animate);
 
@@ -349,6 +363,11 @@ function animate() {
 		chassisBody.angularVelocity.set(0, 0, 0);
 	}
 
+	if (isCarFlippedAndStopped(chassisBody)) {
+		showGameOver();
+		console.log("Car is upside down!");
+	}
+
 
 	orbit.update();
 
@@ -374,7 +393,12 @@ function animate() {
 
 		// Set the camera to look at the model
 		targetCameraLookAt.copy(chassisMesh.position);
-		targetCameraLookAt.y += 2; //add offset
+		if (isCarFlippedAndStopped(chassisBody)) {
+			targetCameraLookAt.y -= 2; //add offset
+		} else {
+			targetCameraLookAt.y += 2; //add offset
+		}
+		
 		camera.lookAt(targetCameraLookAt);
 	}
 
@@ -727,3 +751,8 @@ btnRight.addEventListener('mousedown', pressRight); // For desktop or mouse user
 btnRight.addEventListener('touchend', releaseArrow);
 btnRight.addEventListener('mouseup', releaseArrow); // For desktop or mouse users
 btnRight.addEventListener('touchcancel', releaseArrow); // Handle touch cancel event (e.g., user swipes away)
+
+// Prevent the context menu from appearing on right-click or long press
+window.addEventListener('contextmenu', function (event) {
+	event.preventDefault(); // Prevent the context menu
+});
