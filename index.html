@@ -57,13 +57,14 @@
 
 
 
-  <script type="module" crossorigin src="assets/index-CvSebPsB.js"></script>
+
+  <script type="module" crossorigin src="assets/index-xdVAlPU2.js"></script>
 </head>
 
 <body>
-	<audio id="engineOnSound" src="assets/Engine_start-CthBRv_K-CthBRv_K-CthBRv_K-CthBRv_K-CthBRv_K.ogg"></audio>
-	<audio id="engineLoopSound" src="assets/engine-CcUFndOJ-CcUFndOJ-CcUFndOJ-CcUFndOJ-CcUFndOJ.wav" loop></audio>
-	<audio id="engineOffSound" src="assets/Engine_stop-DF3iY3rM-DF3iY3rM-DF3iY3rM-DF3iY3rM-DF3iY3rM.ogg"></audio>
+	<audio id="engineOnSound" src="assets/Engine_start-CthBRv_K-CthBRv_K-CthBRv_K-CthBRv_K-CthBRv_K-CthBRv_K.ogg"></audio>
+	<audio id="engineLoopSound" src="assets/engine-CcUFndOJ-CcUFndOJ-CcUFndOJ-CcUFndOJ-CcUFndOJ-CcUFndOJ.wav" loop></audio>
+	<audio id="engineOffSound" src="assets/Engine_stop-DF3iY3rM-DF3iY3rM-DF3iY3rM-DF3iY3rM-DF3iY3rM-DF3iY3rM.ogg"></audio>
 
 	<!-- <canvas id="gameCanvas"></canvas> -->
 
@@ -77,8 +78,8 @@
 
 			<button onclick="toggleEngine()"
 				class="pointer-events-auto absolute left-[5%] top-[50%] transform -translateY-1/2 transition transform active:scale-90">
-				<img id="img-engine-off" src="assets/engineOff-CYjBlAzL-CYjBlAzL-CYjBlAzL-CYjBlAzL-CYjBlAzL.png" draggable="false">
-				<img id="img-engine-on" class="hidden" src="assets/engineOn-BQMudlsU-BQMudlsU-BQMudlsU-BQMudlsU-BQMudlsU.png" draggable="false">
+				<img id="img-engine-off" src="assets/engineOff-CYjBlAzL-CYjBlAzL-CYjBlAzL-CYjBlAzL-CYjBlAzL-CYjBlAzL.png" draggable="false">
+				<img id="img-engine-on" class="hidden" src="assets/engineOn-BQMudlsU-BQMudlsU-BQMudlsU-BQMudlsU-BQMudlsU-BQMudlsU.png" draggable="false">
 			</button>
 			<!-- <button onclick="toggleGearPos()"
 				class="pointer-events-auto absolute right-[6%] bottom-[200px] transform -translateY-1/2 transition transform active:scale-90">
@@ -87,20 +88,20 @@
 			</button> -->
 			<div class="absolute left-[3%] bottom-[20px] flex gap-5">
 				<button id="btnLeft" class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/arrowLeft-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A.png" draggable="false">
+					<img src="assets/arrowLeft-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A-CBP_Wf_A.png" draggable="false">
 				</button>
 				<button id="btnRight" class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/arrowRight-Cs7tjixU-Cs7tjixU-Cs7tjixU-Cs7tjixU-Cs7tjixU.png" draggable="false">
+					<img src="assets/arrowRight-Cs7tjixU-Cs7tjixU-Cs7tjixU-Cs7tjixU-Cs7tjixU-Cs7tjixU.png" draggable="false">
 				</button>
 			</div>
 			<div class="absolute right-[3%] bottom-[20px] flex items-end gap-5">
 				<button id="btnBrake"
 					class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/BrakePedal-DPuTjR-H-DPuTjR-H-DPuTjR-H-DPuTjR-H-DPuTjR-H.png" draggable="false">
+					<img src="assets/BrakePedal-DPuTjR-H-DPuTjR-H-DPuTjR-H-DPuTjR-H-DPuTjR-H-DPuTjR-H.png" draggable="false">
 				</button>
 				<button id="btnAccelerate"
 					class="pointer-events-auto transition transform active:scale-90">
-					<img src="assets/GasPedal-By7Bp8S--By7Bp8S--By7Bp8S--By7Bp8S--By7Bp8S-.png" draggable="false">
+					<img src="assets/GasPedal-By7Bp8S--By7Bp8S--By7Bp8S--By7Bp8S--By7Bp8S--By7Bp8S-.png" draggable="false">
 				</button>
 			</div>
 
@@ -142,18 +143,18 @@
 
 	<div id="tutorialStep1" class="absolute left-[5%] top-[55%] pointer-events-none">
 		<div class="animate-bounce">
-			<img src="assets/hand-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88.png">
+			<img src="assets/hand-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88.png">
 		</div>
 	</div>
 	<div id="tutorialStep2" class="hidden absolute right-[3%] bottom-[20px] pointer-events-none">
 		<div class="animate-pressing">
-			<img src="assets/hand-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88.png">
+			<img src="assets/hand-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88-Ca-oVv88.png">
 		</div>
 	</div>
 
 	<div id="loadingScreen"
 		class="absolute w-full h-full m-auto bg-[#000000] bg-opacity-75 flex flex-col gap-1 items-center justify-center">
-		<img class="w-[50px]" src="assets/loading-leBgH9Vw-leBgH9Vw-leBgH9Vw-leBgH9Vw-leBgH9Vw.gif">
+		<img class="w-[50px]" src="assets/loading-leBgH9Vw-leBgH9Vw-leBgH9Vw-leBgH9Vw-leBgH9Vw-leBgH9Vw.gif">
 		<div class="text-white">
 			Loading..
 		</div>
