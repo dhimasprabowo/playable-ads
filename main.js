@@ -22,7 +22,7 @@ camera.position.set(8, 5, -20);
 // camera control
 const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
-orbit.target.set(0,2,-30) 
+orbit.target.set(0, 2, -30)
 
 
 // === LIGHTS ===
@@ -188,27 +188,27 @@ fbxLoader.load(
 
 // === RAYCAST VEHICLE ===
 const vehicle = new CANNON.RaycastVehicle({
-    chassisBody: chassisBody,         // The physics body representing the car chassis
-    indexRightAxis: 0,                // Local x-axis (right)
-    indexUpAxis: 1,                   // Local y-axis (up)
-    indexForwardAxis: 2              // Local z-axis (forward)
+	chassisBody: chassisBody,         // The physics body representing the car chassis
+	indexRightAxis: 0,                // Local x-axis (right)
+	indexUpAxis: 1,                   // Local y-axis (up)
+	indexForwardAxis: 2              // Local z-axis (forward)
 });
 
 // Define common wheel options for all four wheels
 const wheelOptions = {
-    radius: 0.625,                            // Radius of the wheel
-    directionLocal: new CANNON.Vec3(0, -1, 0), // Direction of the suspension (downward in local space)
-    suspensionStiffness: 30,                 // Stiffness of the suspension spring
-    suspensionRestLength: 0.5,               // Rest length of the suspension (how much travel it has at rest)
-    frictionSlip: 9,                         // Friction/grip of the tires (higher = more grip)
-    dampingRelaxation: 2.3,                  // Suspension rebound damping (how quickly it returns to rest)
-    dampingCompression: 4.4,                 // Damping when suspension is compressed (absorbs impact)
-    maxSuspensionForce: 100000,              // Max force the suspension can apply
-    rollInfluence: 0.125,                      // How much body roll affects the vehicle
-    axleLocal: new CANNON.Vec3(-1, 0, 0),     // Direction the wheels spin (typically left in local space)
-    maxSuspensionTravel: 0.3,                // Maximum distance suspension can travel from rest
-    customSlidingRotationalSpeed: -30,       // Speed at which wheels spin when sliding
-    useCustomSlidingRotationalSpeed: true    // Enable the custom sliding speed
+	radius: 0.625,                            // Radius of the wheel
+	directionLocal: new CANNON.Vec3(0, -1, 0), // Direction of the suspension (downward in local space)
+	suspensionStiffness: 30,                 // Stiffness of the suspension spring
+	suspensionRestLength: 0.5,               // Rest length of the suspension (how much travel it has at rest)
+	frictionSlip: 9,                         // Friction/grip of the tires (higher = more grip)
+	dampingRelaxation: 2.3,                  // Suspension rebound damping (how quickly it returns to rest)
+	dampingCompression: 4.4,                 // Damping when suspension is compressed (absorbs impact)
+	maxSuspensionForce: 100000,              // Max force the suspension can apply
+	rollInfluence: 0.125,                      // How much body roll affects the vehicle
+	axleLocal: new CANNON.Vec3(-1, 0, 0),     // Direction the wheels spin (typically left in local space)
+	maxSuspensionTravel: 0.3,                // Maximum distance suspension can travel from rest
+	customSlidingRotationalSpeed: -30,       // Speed at which wheels spin when sliding
+	useCustomSlidingRotationalSpeed: true    // Enable the custom sliding speed
 };
 
 // Add 4 wheels
@@ -283,16 +283,16 @@ let isTurningLeft = false;
 let isTurningRight = false;
 
 function isCarFlippedAndStopped(body) {
-    // 1. Check if the car is upside down
-    const up = new CANNON.Vec3(0, 1, 0);                  // Local up vector
-    const worldUp = body.quaternion.vmult(up);           // Convert to world space
-    const upsideDown = worldUp.y < 0;
+	// 1. Check if the car is upside down
+	const up = new CANNON.Vec3(0, 1, 0);                  // Local up vector
+	const worldUp = body.quaternion.vmult(up);           // Convert to world space
+	const upsideDown = worldUp.y < 0;
 
-    // 2. Check if the car is not moving
-    const speed = body.velocity.length();                // Get speed
-    const isStopped = speed < 0.1;                       // Consider near zero
+	// 2. Check if the car is not moving
+	const speed = body.velocity.length();                // Get speed
+	const isStopped = speed < 0.1;                       // Consider near zero
 
-    return upsideDown && isStopped;
+	return upsideDown && isStopped;
 }
 
 
@@ -398,7 +398,7 @@ function animate() {
 		} else {
 			targetCameraLookAt.y += 2; //add offset
 		}
-		
+
 		camera.lookAt(targetCameraLookAt);
 	}
 
@@ -503,6 +503,14 @@ function checkCompletion() {
 
 			if (angleInDegrees < angleTolerance && chassisMesh.position.distanceTo(parkingSpot.position) < distanceTolerance) {
 				showGameOver(true);
+
+				// Freeze physics
+				chassisBody.velocity.set(0, 0, 0);
+				chassisBody.angularVelocity.set(0, 0, 0);
+				for (let i = 0; i < 4; i++) {
+					vehicle.applyEngineForce(0, i);
+					vehicle.setSteeringValue(0, i);
+				}
 			}
 
 			completionDisplay.style.display = 'flex'
