@@ -144,7 +144,7 @@ groundLoader.load(
 )
 
 // === CHASSIS ===
-const chassisShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2));
+const chassisShape = new CANNON.Box(new CANNON.Vec3(1.75, 1, 4));
 const chassisBody = new CANNON.Body({ mass: 150 });
 chassisBody.addShape(chassisShape);
 chassisBody.position.set(0, 1.5, -30);
@@ -165,12 +165,12 @@ fbxLoader.load(
 	(object) => {
 		chassisMesh.add(object)
 
-		let modelScale = 0.015;
+		let modelScale = 0.02;
 
 		object.scale.set(modelScale, modelScale, modelScale)
 		// object.position.x = 0
-		object.position.y = -1
-		object.position.z = -0.45
+		object.position.y = -1.5
+		object.position.z = -0.6
 		// object.rotation.y = Math.PI
 		// object.rotation.z = 3.13
 
@@ -196,13 +196,13 @@ const vehicle = new CANNON.RaycastVehicle({
 
 // Define common wheel options for all four wheels
 const wheelOptions = {
-	radius: 0.625,                            // Radius of the wheel
+	radius: 0.825,                            // Radius of the wheel
 	directionLocal: new CANNON.Vec3(0, -1, 0), // Direction of the suspension (downward in local space)
-	suspensionStiffness: 30,                 // Stiffness of the suspension spring
-	suspensionRestLength: 0.5,               // Rest length of the suspension (how much travel it has at rest)
+	suspensionStiffness: 25,                 // Stiffness of the suspension spring
+	suspensionRestLength: 0.75,               // Rest length of the suspension (how much travel it has at rest)
 	frictionSlip: 9,                         // Friction/grip of the tires (higher = more grip)
-	dampingRelaxation: 2.3,                  // Suspension rebound damping (how quickly it returns to rest)
-	dampingCompression: 4.4,                 // Damping when suspension is compressed (absorbs impact)
+	dampingRelaxation: 2,                  // Suspension rebound damping (how quickly it returns to rest)
+	dampingCompression: 2.4,                 // Damping when suspension is compressed (absorbs impact)
 	maxSuspensionForce: 100000,              // Max force the suspension can apply
 	rollInfluence: 0.125,                      // How much body roll affects the vehicle
 	axleLocal: new CANNON.Vec3(-1, 0, 0),     // Direction the wheels spin (typically left in local space)
@@ -212,8 +212,8 @@ const wheelOptions = {
 };
 
 // Add 4 wheels
-const offsetX = 1.35;
-const offsetZ = 2.05;
+const offsetX = 1.75;
+const offsetZ = 2.75;
 [
 	new CANNON.Vec3(-offsetX, 0, offsetZ),
 	new CANNON.Vec3(offsetX, 0, offsetZ),
@@ -238,7 +238,7 @@ function createWheelVisual(_index) {
 			container.add(object)
 			scene.add(container);  // Add the empty object to the scene
 
-			let modelScale = 0.015;
+			let modelScale = 0.02;
 			object.scale.set(modelScale, modelScale, modelScale)
 
 			// console.log("test", _index);
