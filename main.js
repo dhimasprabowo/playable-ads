@@ -24,6 +24,14 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
 orbit.target.set(0, 2, -30)
 
+// Limit the camera movement
+orbit.minPolarAngle = Math.PI / 6; // Limit up angle (in radians)
+orbit.maxPolarAngle = Math.PI / 2.2; // Limit ground (in radians)
+
+// Limit zoom
+orbit.minDistance = 8;
+orbit.maxDistance = 20;
+
 
 // === LIGHTS ===
 // Add a light
@@ -369,6 +377,7 @@ function animate() {
 	}
 
 
+	orbit.target.copy(chassisMesh.position);
 	orbit.update();
 
 
@@ -467,7 +476,7 @@ const parkingLoader = new FBXLoader()
 parkingLoader.load(
 	'assets/ParkingSpot.fbx',
 	(object) => {
-		let scaleObj = 0.03;
+		let scaleObj = 0.04;
 		object.scale.set(scaleObj, scaleObj, scaleObj)
 
 		parkingSpot.add(object)
