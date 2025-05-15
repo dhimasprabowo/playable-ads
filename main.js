@@ -413,6 +413,14 @@ function animate() {
 		camera.lookAt(targetCameraLookAt);
 	}
 
+	// === SPEEDOMETER ===
+	const localForward = new CANNON.Vec3(0, 0, 1);
+	const worldForward = chassisBody.quaternion.vmult(localForward);
+	const forwardSpeed = chassisBody.velocity.dot(worldForward); // signed
+	const speedKmh = Math.round(Math.abs(forwardSpeed) * 3.6);
+	if(speedometer) speedometer.textContent = speedKmh + ' km/h'
+	// console.log(`Speed: ${speedKmh} km/h`)
+
 	renderer.render(scene, camera);
 }
 
@@ -641,6 +649,9 @@ const completeScreen = document.getElementById('completeScreen');
 const loadingScreen = document.getElementById('loadingScreen');
 const completionDisplay = document.getElementById('completionDisplay');
 var completion = completionDisplay.children[1];
+const speedoMeterDisplay = document.getElementById('speedoMeterDisplay');
+var speedometer = speedoMeterDisplay.children[1];
+console.log(speedoMeterDisplay)
 
 function updateEngineButton() {
 	document.getElementById("img-engine-off").style.display = engineOn ? 'none' : 'block'
