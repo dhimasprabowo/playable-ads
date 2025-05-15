@@ -367,8 +367,10 @@ function animate() {
 			vehicle.applyEngineForce(0, i);
 			vehicle.setSteeringValue(0, i);
 		}
-		chassisBody.velocity.set(0, 0, 0);
-		chassisBody.angularVelocity.set(0, 0, 0);
+		// chassisBody.velocity.set(0, 0, 0);
+		// chassisBody.angularVelocity.set(0, 0, 0);
+		chassisBody.velocity.scale(0.9, chassisBody.velocity);
+		chassisBody.angularVelocity.scale(0.9, chassisBody.angularVelocity);
 	}
 
 	if (isCarFlippedAndStopped(chassisBody)) {
